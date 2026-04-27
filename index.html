@@ -1662,31 +1662,53 @@
       </div>
     </div>
 
-    <!-- 添加家属弹窗 -->
+    <!-- 家属绑定弹窗 -->
     <div class="modal-overlay" id="addFamilyModal" onclick="if(event.target===this)this.classList.remove('show')">
       <div class="modal-content">
         <div class="modal-close" onclick="document.getElementById('addFamilyModal').classList.remove('show')">&times;</div>
-        <h3>添加家属</h3>
-        <div class="form-group">
-          <label class="form-label">家属姓名</label>
-          <input type="text" class="form-input" id="familyName" placeholder="请输入姓名">
-        </div>
-        <div class="form-group">
-          <label class="form-label">与您的关系</label>
-          <div class="relation-picker">
-            <button class="relation-opt" onclick="pickRelation(this)">配偶</button>
-            <button class="relation-opt" onclick="pickRelation(this)">子女</button>
-            <button class="relation-opt" onclick="pickRelation(this)">父母</button>
-            <button class="relation-opt" onclick="pickRelation(this)">兄弟姐妹</button>
-            <button class="relation-opt" onclick="pickRelation(this)">其他</button>
+        <h3>家属绑定</h3>
+
+        <!-- 患者视角：生成邀请码 -->
+        <div id="familyInviteSection">
+          <div class="form-group">
+            <label class="form-label">生成邀请码给家属</label>
+            <div class="form-tip" style="margin-bottom:12px">让家属注册 PillPal 后，输入这个邀请码就能绑定您的账号，远程查看您的用药情况。</div>
+            <div class="invite-code-box" id="inviteCodeBox" style="display:none">
+              <div class="invite-code-label">您的邀请码</div>
+              <div class="invite-code-value" id="inviteCodeValue"></div>
+              <div class="invite-code-tip">请将此邀请码发送给家属，有效期 24 小时</div>
+              <button class="btn-secondary-lg" style="width:100%;margin-top:8px" onclick="copyInviteCode()">复制邀请码</button>
+            </div>
+            <button class="btn-primary-lg" style="width:100%" id="genInviteBtn" onclick="handleGenInviteCode()">生成邀请码</button>
           </div>
+
+          <div style="text-align:center;color:var(--text-third);margin:20px 0;font-size:13px">— 或者 —</div>
+
+          <!-- 家属视角：输入邀请码 -->
+          <div class="form-group">
+            <label class="form-label">我是家属，输入邀请码绑定</label>
+            <input type="text" class="form-input" id="bindCodeInput" placeholder="请输入患者的邀请码" style="text-align:center;font-size:18px;letter-spacing:4px;text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label class="form-label">您和患者的关系</label>
+            <div class="relation-picker">
+              <button class="relation-opt" onclick="pickRelation(this)">配偶</button>
+              <button class="relation-opt" onclick="pickRelation(this)">儿子</button>
+              <button class="relation-opt" onclick="pickRelation(this)">女儿</button>
+              <button class="relation-opt" onclick="pickRelation(this)">父母</button>
+              <button class="relation-opt" onclick="pickRelation(this)">兄弟姐妹</button>
+              <button class="relation-opt" onclick="pickRelation(this)">其他</button>
+            </div>
+          </div>
+          <button class="btn-primary-lg" style="width:100%;margin-top:8px" onclick="handleBindFamily()">绑定</button>
         </div>
-        <div class="form-group">
-          <label class="form-label">手机号</label>
-          <input type="tel" class="form-input" id="familyPhone" placeholder="请输入家属手机号">
+
+        <!-- 绑定结果 -->
+        <div id="familyBindResult" style="display:none;text-align:center;padding:20px 0">
+          <div style="font-size:48px;margin-bottom:12px">&#10003;</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:8px" id="bindResultTitle"></div>
+          <div style="font-size:13px;color:var(--text-sec)" id="bindResultDesc"></div>
         </div>
-        <div class="form-tip">绑定后，家属将收到短信邀请，确认后即可共同管理用药</div>
-        <button class="btn-primary-lg" style="width:100%;margin-top:16px" onclick="confirmAddFamily()">发送绑定邀请</button>
       </div>
     </div>
 

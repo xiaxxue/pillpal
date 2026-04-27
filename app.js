@@ -1658,54 +1658,77 @@ function pickTime(btn) {
   showToast('已设置为服药前 ' + btn.textContent + ' 提醒');
 }
 
-// ====== 添加家属 ======
+// ====== 家属绑定 ======
 let selectedRelation = '';
 
 function openAddFamily() {
   selectedRelation = '';
-  document.getElementById('familyName').value = '';
-  document.getElementById('familyPhone').value = '';
-  document.querySelectorAll('.relation-opt').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('#addFamilyModal .relation-opt').forEach(b => b.classList.remove('selected'));
+  document.getElementById('inviteCodeBox').style.display = 'none';
+  document.getElementById('genInviteBtn').style.display = '';
+  document.getElementById('bindCodeInput').value = '';
+  document.getElementById('familyInviteSection').style.display = '';
+  document.getElementById('familyBindResult').style.display = 'none';
   document.getElementById('addFamilyModal').classList.add('show');
 }
 
 function pickRelation(btn) {
-  document.querySelectorAll('.relation-opt').forEach(b => b.classList.remove('selected'));
+  var picker = btn.closest('.relation-picker');
+  picker.querySelectorAll('.relation-opt').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   selectedRelation = btn.textContent;
 }
 
-function confirmAddFamily() {
-  const name = document.getElementById('familyName').value.trim();
-  const phone = document.getElementById('familyPhone').value.trim();
+// 患者：生成邀请码
+async function handleGenInviteCode() {
+  var user = await getCurrentUser();
+  if (!user) { showToast('请先登录'); return; }
 
-  if (!name) { showToast('请输入家属姓名'); return; }
-  if (!selectedRelation) { showToast('请选择与您的关系'); return; }
-  if (!phone || phone.length < 11) { showToast('请输入正确的手机号'); return; }
+  document.getElementById('genInviteBtn').textContent = '生成中...';
+  document.getElementById('genInviteBtn').disabled = true;
 
-  // 在家属列表中插入新卡片（插到"添加家属"按钮前面）
-  const familyList = document.querySelector('.family-list');
-  const addBtn = familyList.lastElementChild;
+  var code = await generateInviteCode();
+  if (code) {
+    document.getElementById('inviteCodeValue').textContent = code;
+    document.getElementById('inviteCodeBox').style.display = '';
+    document.getElementById('genInviteBtn').style.display = 'none';
+  } else {
+    showToast('生成失败，请重试');
+    document.getElementById('genInviteBtn').textContent = '生成邀请码';
+    document.getElementById('genInviteBtn').disabled = false;
+  }
+}
 
-  const card = document.createElement('div');
-  card.className = 'family-card';
-  card.innerHTML =
-    '<div class="family-avatar">' + name.charAt(0) + '</div>' +
-    '<div class="family-info">' +
-      '<div class="family-name">' + escapeHtml(name) +
-        ' <span class="family-role">' + escapeHtml(selectedRelation) + '</span></div>' +
-      '<div class="family-phone">' + phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') + '</div>' +
-    '</div>' +
-    '<div class="family-status bound">邀请中</div>';
+function copyInviteCode() {
+  var code = document.getElementById('inviteCodeValue').textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code);
+  }
+  showToast('邀请码已复制：' + code);
+}
 
-  familyList.insertBefore(card, addBtn);
+// 家属：输入邀请码绑定
+async function handleBindFamily() {
+  var user = await getCurrentUser();
+  if (!user) { showToast('请先登录'); return; }
 
-  // 保存家属
-  familyData.push({ name: name, relation: selectedRelation, phone: phone });
-  saveData('family', familyData);
+  var code = document.getElementById('bindCodeInput').value.trim().toUpperCase();
+  if (!code) { showToast('请输入邀请码'); return; }
+  if (!selectedRelation) { showToast('请选择您和患者的关系'); return; }
 
-  document.getElementById('addFamilyModal').classList.remove('show');
-  showToast('已向 ' + name + ' 发送绑定邀请');
+  showToast('正在绑定...');
+  var result = await bindFamily(code, selectedRelation);
+
+  if (result.error) {
+    showToast(result.error);
+  } else {
+    // 显示绑定成功
+    document.getElementById('familyInviteSection').style.display = 'none';
+    document.getElementById('familyBindResult').style.display = '';
+    document.getElementById('bindResultTitle').textContent = '绑定成功！';
+    document.getElementById('bindResultDesc').textContent = '您已绑定为' + selectedRelation + '，可以远程查看患者的用药情况';
+    showToast('家属绑定成功');
+  }
 }
 
 // ====== 页面加载时恢复保存的数据 ======

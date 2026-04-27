@@ -3053,3 +3053,16 @@ input { font-family: inherit; font-size: inherit; }
   cursor: pointer; text-decoration: underline;
 }
 .auth-skip:active { color: var(--primary); }
+
+/* 邀请码 */
+.invite-code-box {
+  text-align: center; padding: 20px;
+  background: var(--primary-light); border-radius: var(--radius);
+  border: 2px dashed var(--primary); margin-bottom: 12px;
+}
+.invite-code-label { font-size: 13px; color: var(--text-sec); margin-bottom: 8px; }
+.invite-code-value {
+  font-size: 32px; font-weight: 700; color: var(--primary);
+  letter-spacing: 6px; font-family: monospace;
+}
+.invite-code-tip { font-size: 12px; color: var(--text-sec); margin-top: 8px; }
