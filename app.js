@@ -1,7 +1,8 @@
-// ====== 本地存储 ======
-// localStorage 就是浏览器自带的一个小仓库，刷新页面数据不会丢
+// ====== 本地存储（同时同步到云端） ======
 function saveData(key, value) {
   try { localStorage.setItem('yygh_' + key, JSON.stringify(value)); } catch(e) {}
+  // 登录后同步到 Supabase
+  syncToCloud(key, value);
 }
 function loadData(key, fallback) {
   try {
@@ -10,12 +11,89 @@ function loadData(key, fallback) {
   } catch(e) { return fallback; }
 }
 
-// 保存今日打卡记录：{ "氨氯地平片_7": "done_07:12", "二甲双胍_14.5": "skip_忘记携带" }
+// 后台同步到 Supabase（不阻塞界面）
+function syncToCloud(key, value) {
+  if (!sb) return;
+  sb.auth.getUser().then(function(result) {
+    if (!result.data || !result.data.user) return;
+    var userId = result.data.user.id;
+
+    // 打卡记录同步
+    if (key.startsWith('med_')) {
+      var dateStr = key.replace('med_', '');
+      Object.keys(value).forEach(function(medKey) {
+        var record = value[medKey];
+        var status = record.startsWith('done') ? 'done' : 'skip';
+        var takenAt = status === 'done' ? record.replace('done_', '') : null;
+        var skipReason = status === 'skip' ? record.replace('skip_', '') : null;
+        sb.from('daily_records').upsert({
+          user_id: userId,
+          medication_id: medKey,
+          record_date: dateStr,
+          status: status,
+          taken_at: takenAt,
+          skip_reason: skipReason
+        }, { onConflict: 'user_id, medication_id, record_date', ignoreDuplicates: false }).then(function(){});
+      });
+    }
+
+    // 库存同步
+    if (key === 'stock') {
+      Object.keys(value).forEach(function(drugName) {
+        sb.from('medications')
+          .update({ stock_count: value[drugName] })
+          .eq('user_id', userId)
+          .eq('name', drugName)
+          .then(function(){});
+      });
+    }
+  });
+}
+
+// 页面加载时从云端拉取数据（覆盖本地）
+async function loadFromCloud() {
+  if (!sb) return;
+  var result = await sb.auth.getUser();
+  if (!result.data || !result.data.user) return;
+  var userId = result.data.user.id;
+
+  // 拉取今日打卡记录
+  var todayRecords = await sb.from('daily_records')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('record_date', todayStr);
+  if (todayRecords.data && todayRecords.data.length > 0) {
+    var records = {};
+    todayRecords.data.forEach(function(r) {
+      if (r.status === 'done') {
+        records[r.medication_id] = 'done_' + (r.taken_at || '');
+      } else if (r.status === 'skip') {
+        records[r.medication_id] = 'skip_' + (r.skip_reason || '');
+      }
+    });
+    medRecords = records;
+    localStorage.setItem('yygh_med_' + todayStr, JSON.stringify(records));
+  }
+
+  // 拉取库存
+  var medsResult = await sb.from('medications')
+    .select('name, stock_count')
+    .eq('user_id', userId);
+  if (medsResult.data && medsResult.data.length > 0) {
+    var stock = {};
+    medsResult.data.forEach(function(m) {
+      stock[m.name] = m.stock_count;
+    });
+    stockData = stock;
+    localStorage.setItem('yygh_stock', JSON.stringify(stock));
+  }
+}
+
 var todayStr = new Date().toISOString().slice(0, 10);
 var medRecords = loadData('med_' + todayStr, {});
-var stockData = loadData('stock', {}); // { "氨氯地平片": 12, ... }
-var familyData = loadData('family', []); // [{ name, relation, phone }]
-var reminderData = loadData('reminder', {}); // { "应用通知": true, ... }
+var stockData = loadData('stock', {});
+var familyData = loadData('family', []);
+var reminderData = loadData('reminder', {});
 
 // ====== 顶栏自动收起 ======
 let topBarTimer = null;

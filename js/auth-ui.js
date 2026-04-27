@@ -21,10 +21,9 @@ var selectedAuthRole = 'patient';
 async function checkAuthState() {
   var user = await getCurrentUser();
   if (user) {
-    // 已登录，隐藏登录弹窗
     hideAuthModal();
-    // 迁移本地数据
     await migrateLocalData();
+    if (typeof loadFromCloud === 'function') await loadFromCloud();
   }
   // 未登录，显示登录弹窗（默认已显示）
 
@@ -98,8 +97,10 @@ async function handleLogin() {
       showAuthError(msg);
     } else {
       hideAuthModal();
-      showToast('登录成功');
+      showToast('登录成功，正在同步数据...');
       await migrateLocalData();
+      if (typeof loadFromCloud === 'function') await loadFromCloud();
+      showToast('数据同步完成');
     }
   } catch(e) {
     switchAuthMode('login');
