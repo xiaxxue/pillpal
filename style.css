@@ -3066,3 +3066,27 @@ input { font-family: inherit; font-size: inherit; }
   letter-spacing: 6px; font-family: monospace;
 }
 .invite-code-tip { font-size: 12px; color: var(--text-sec); margin-top: 8px; }
+
+/* PWA 安装提示条 */
+.install-bar {
+  position: fixed; bottom: 70px; left: 8px; right: 8px;
+  max-width: 414px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--card); border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  z-index: 250; animation: msgIn .3s ease;
+}
+.install-bar-text { flex: 1; }
+.install-bar-text strong { display: block; font-size: 14px; }
+.install-bar-text span { font-size: 12px; color: var(--text-sec); }
+.install-bar-btn {
+  padding: 8px 20px; background: var(--primary); color: #fff;
+  border-radius: 20px; font-size: 14px; font-weight: 600;
+  flex-shrink: 0;
+}
+.install-bar-btn:active { transform: scale(.95); }
+.install-bar-close {
+  font-size: 20px; color: var(--text-third); background: none;
+  padding: 4px; flex-shrink: 0;
+}

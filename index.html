@@ -3,8 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>慢病用药小管家</title>
+  <title>PillPal 用药管家</title>
   <link rel="stylesheet" href="style.css">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b9d6a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PillPal">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1606,6 +1613,16 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <!-- PWA 安装提示条 -->
+    <div class="install-bar" id="installBar" style="display:none">
+      <div class="install-bar-text">
+        <strong>安装 PillPal 到桌面</strong>
+        <span>像 App 一样使用，离线也能打卡</span>
+      </div>
+      <button class="install-bar-btn" onclick="installApp()">安装</button>
+      <button class="install-bar-close" onclick="dismissInstall()">&times;</button>
+    </div>
+
     <!-- 撤销浮条 -->
     <div class="undo-toast" id="undoToast">
       <span id="undoToastText"></span>
@@ -2254,5 +2271,39 @@
   <script src="js/db.js"></script>
   <script src="app.js"></script>
   <script src="js/auth-ui.js"></script>
+  <script>
+  // 注册 Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(function() {
+      console.log('Service Worker 注册成功');
+    });
+  }
+
+  // PWA 安装提示
+  var installPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    installPrompt = e;
+    // 显示安装提示条
+    var bar = document.getElementById('installBar');
+    if (bar) bar.style.display = 'flex';
+  });
+
+  function installApp() {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function(result) {
+      if (result.outcome === 'accepted') {
+        showToast('安装成功！可在桌面打开 PillPal');
+      }
+      installPrompt = null;
+      document.getElementById('installBar').style.display = 'none';
+    });
+  }
+
+  function dismissInstall() {
+    document.getElementById('installBar').style.display = 'none';
+  }
+  </script>
 </body>
 </html>
