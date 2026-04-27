@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PillPal 用药管家 - 慢病患者的用药好帮手</title>
+  <style>
+    :root {
+      --primary: #0b9d6a;
+      --primary-light: #e6f7f0;
+      --primary-dark: #078a5a;
+      --text: #1a1a2e;
+      --text-sec: #6b7280;
+      --bg: #f8faf9;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+      color: var(--text); background: #fff; line-height: 1.6;
+    }
+
+    /* 顶部导航 */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px; max-width: 960px; margin: 0 auto;
+    }
+    .nav-logo { font-size: 22px; font-weight: 700; color: var(--primary); }
+    .nav-logo span { font-size: 14px; color: var(--text-sec); font-weight: 400; margin-left: 8px; }
+    .nav-btn {
+      padding: 8px 20px; background: var(--primary); color: #fff;
+      border: none; border-radius: 20px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: transform .15s;
+    }
+    .nav-btn:hover { transform: scale(1.05); }
+
+    /* 主视觉 */
+    .hero {
+      text-align: center; padding: 60px 24px 40px;
+      background: linear-gradient(180deg, #fff 0%, var(--bg) 100%);
+    }
+    .hero-pill { font-size: 64px; margin-bottom: 16px; }
+    .hero h1 { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+    .hero h1 span { color: var(--primary); }
+    .hero p { font-size: 18px; color: var(--text-sec); max-width: 500px; margin: 0 auto 32px; }
+    .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-download {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 32px; background: var(--primary); color: #fff;
+      border: none; border-radius: 12px; font-size: 17px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(11,157,106,0.3); }
+    .btn-demo {
+      padding: 14px 32px; background: #fff; color: var(--primary);
+      border: 2px solid var(--primary); border-radius: 12px;
+      font-size: 17px; font-weight: 600; cursor: pointer; transition: all .2s;
+    }
+    .btn-demo:hover { background: var(--primary-light); }
+    .hero-tip { font-size: 13px; color: var(--text-sec); margin-top: 16px; }
+
+    /* 手机预览图 */
+    .phone-preview {
+      max-width: 300px; margin: 40px auto 0;
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      border: 8px solid #222;
+    }
+    .phone-preview iframe {
+      width: 100%; height: 560px; border: none;
+      transform-origin: top left;
+    }
+
+    /* 功能亮点 */
+    .features {
+      padding: 60px 24px; max-width: 960px; margin: 0 auto;
+    }
+    .features h2 {
+      text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 40px;
+    }
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      padding: 28px 24px; background: var(--bg); border-radius: 16px;
+      transition: transform .2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); }
+    .feature-icon { font-size: 36px; margin-bottom: 12px; }
+    .feature-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .feature-desc { font-size: 14px; color: var(--text-sec); line-height: 1.7; }
+
+    /* 使用流程 */
+    .flow {
+      padding: 60px 24px; background: var(--bg);
+    }
+    .flow-inner { max-width: 960px; margin: 0 auto; }
+    .flow h2 { text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 40px; }
+    .flow-steps {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+    }
+    .flow-step {
+      text-align: center; width: 180px;
+    }
+    .flow-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700; margin: 0 auto 12px;
+    }
+    .flow-step-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .flow-step-desc { font-size: 13px; color: var(--text-sec); }
+
+    /* 底部 CTA */
+    .cta {
+      text-align: center; padding: 60px 24px;
+    }
+    .cta h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+    .cta p { font-size: 16px; color: var(--text-sec); margin-bottom: 24px; }
+
+    /* 底部 */
+    .footer {
+      text-align: center; padding: 24px;
+      font-size: 13px; color: var(--text-sec);
+      border-top: 1px solid #e5e7eb;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 28px; }
+      .hero p { font-size: 16px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .flow-steps { flex-direction: column; align-items: center; }
+      .phone-preview { max-width: 240px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-logo">PillPal <span>用药管家</span></div>
+    <button class="nav-btn" onclick="downloadApp()">立即使用</button>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-pill">💊</div>
+    <h1>吃药这件事<br>交给 <span>PillPal</span></h1>
+    <p>专为慢病患者设计的用药管理工具。提醒吃药、管理库存、在线问诊、家属协同，一个 App 全搞定。</p>
+    <div class="hero-buttons">
+      <button class="btn-download" onclick="downloadApp()">
+        <span>📲</span> 免费下载到手机
+      </button>
+      <button class="btn-demo" onclick="window.open('index.html','_blank')">
+        先看看演示
+      </button>
+    </div>
+    <div class="hero-tip">无需应用商店，浏览器直接安装 · 支持 Android / iPhone</div>
+
+    <div class="phone-preview">
+      <iframe src="index.html" scrolling="yes"></iframe>
+    </div>
+  </section>
+
+  <section class="features">
+    <h2>为什么选 PillPal？</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⏰</div>
+        <div class="feature-title">准时提醒，不忘吃药</div>
+        <div class="feature-desc">按你的用药计划定时提醒，支持多种提醒方式。忘了吃？30分钟后再提醒你。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <div class="feature-title">库存预警，不怕断药</div>
+        <div class="feature-desc">自动追踪药品剩余量，快吃完时提前提醒续方购药，再也不会断药。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👩‍⚕️</div>
+        <div class="feature-title">在线问诊，一键续方</div>
+        <div class="feature-desc">图文、电话问诊，医嘱自动同步到用药计划。续方不用重新描述病情。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👨‍👩‍👦</div>
+        <div class="feature-title">家属协同，远程守护</div>
+        <div class="feature-desc">子女远程查看父母吃药情况，漏服即时通知，帮续方帮约医生。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🦘</div>
+        <div class="feature-title">小团助手，有问必答</div>
+        <div class="feature-desc">AI 用药助手，漏服怎么办、药能不能一起吃、要不要调药，随时问。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">数据报告，给医生看</div>
+        <div class="feature-desc">自动生成服药报告，复诊时一键导出，医生一目了然。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flow">
+    <div class="flow-inner">
+      <h2>3 步开始使用</h2>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-step-title">点击下载</div>
+          <div class="flow-step-desc">点"安装到桌面"<br>不需要应用商店</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-step-title">注册账号</div>
+          <div class="flow-step-desc">邮箱注册<br>30秒完成</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-step-title">添加药品</div>
+          <div class="flow-step-desc">输入你的药品和时间<br>PillPal 帮你管理一切</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>开始管理你的用药</h2>
+    <p>免费使用，无广告，数据安全加密</p>
+    <button class="btn-download" onclick="downloadApp()" style="margin:0 auto">
+      <span>📲</span> 免费下载到手机
+    </button>
+    <div class="hero-tip" style="margin-top:12px">支持 Android / iPhone · 无需应用商店</div>
+  </section>
+
+  <footer class="footer">
+    PillPal 用药管家 · 让每一次吃药都不被遗忘
+  </footer>
+
+  <script>
+  function downloadApp() {
+    // 检测设备
+    var ua = navigator.userAgent;
+    var isIOS = /iPhone|iPad|iPod/.test(ua);
+    var isAndroid = /Android/.test(ua);
+
+    if (isIOS) {
+      alert('iPhone 安装方法：\n\n1. 用 Safari 打开此页面\n2. 点底部分享按钮 ↑\n3. 选择「添加到主屏幕」\n\n安装后桌面会出现 PillPal 图标');
+      window.location.href = 'index.html';
+    } else if (isAndroid) {
+      // 安卓直接跳转到 App，浏览器会自动弹安装提示
+      window.location.href = 'index.html';
+    } else {
+      // 电脑端
+      window.open('index.html', '_blank');
+    }
+  }
+  </script>
+</body>
+</html>
