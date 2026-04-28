@@ -90,6 +90,12 @@ async function obFinish() {
   var medStock = parseInt(document.getElementById('obMedStock').value) || 30;
 
   if (medName && medDosage) {
+    // 检查重复
+    var existingMeds = await getMedications();
+    var dup = existingMeds.find(function(m) { return m.name === medName; });
+    if (dup) {
+      showToast(medName + ' 已存在，跳过添加');
+    } else {
     var times = [];
     document.querySelectorAll('#obTimePicker .relation-opt.selected').forEach(function(b) {
       times.push(b.textContent.trim());
@@ -109,6 +115,7 @@ async function obFinish() {
       daily_usage: times.length || 1,
       note: ''
     });
+    } // end if !dup
   }
 
   // 标记引导完成

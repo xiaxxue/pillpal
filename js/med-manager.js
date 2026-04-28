@@ -131,6 +131,14 @@ async function handleAddMed() {
   if (!name) { showToast('请输入药品名称'); return; }
   if (!dosage) { showToast('请输入剂量'); return; }
 
+  // 检查重复：同名药品+同时间段不允许重复添加
+  var existingMeds = await getMedications();
+  var duplicate = existingMeds.find(function(m) { return m.name === name; });
+  if (duplicate) {
+    showToast(name + ' 已经在用药计划中，无需重复添加');
+    return;
+  }
+
   // 频次
   var freqBtn = document.querySelector('#addMedFreqPicker .relation-opt.selected');
   var frequency = freqBtn ? parseInt(freqBtn.textContent) : 1;
