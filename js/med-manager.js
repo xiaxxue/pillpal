@@ -90,6 +90,15 @@ async function restoreStock(card) {
   }
 }
 
+// ====== 删除药品 ======
+async function handleDeleteMed(medId, medName) {
+  if (!confirm('确定要删除「' + medName + '」吗？删除后无法恢复。')) return;
+
+  await deleteMedication(medId);
+  showToast(medName + ' 已从用药计划中删除');
+  await refreshTimeline();
+}
+
 // 打开添加药品弹窗
 function openAddMedModal() {
   document.getElementById('addMedName').value = '';
@@ -331,7 +340,10 @@ function updateStockFromMeds(meds) {
     html += '<div class="box-info"><span class="box-info-label">可服天数</span><span' + (isUrgent ? ' class="warn-text"' : '') + '>' + days + '天</span></div>';
     html += '<div class="box-info"><span class="box-info-label">预计用完</span><span' + (isUrgent ? ' class="warn-text"' : '') + '>' + dateStr + '</span></div>';
     html += '</div>';
-    html += '<button class="box-edit-btn full-w" onclick="editStock(this, \'' + escapeHtml(med.name) + '\', ' + med.stock_count + ', ' + daily + ')">修正信息</button>';
+    html += '<div class="box-btn-row">';
+    html += '<button class="box-edit-btn" style="flex:1" onclick="editStock(this, \'' + escapeHtml(med.name) + '\', ' + med.stock_count + ', ' + daily + ')">修正信息</button>';
+    html += '<button class="box-edit-btn" style="color:var(--danger)" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">删除</button>';
+    html += '</div>';
     html += '</div>';
   });
 
