@@ -254,6 +254,22 @@ async function refreshTimeline() {
 
   timeline.innerHTML = html;
 
+  // 更新下次提醒时间
+  var realNextTime = document.getElementById('realNextTime');
+  if (realNextTime) {
+    var now = new Date();
+    var currentHour = now.getHours() + now.getMinutes() / 60;
+    var nextTime = null;
+    var timeMap = { 7: '07:00', 8: '08:00', 14.5: '14:30', 21: '21:00' };
+    Object.keys(timeSlots).forEach(function(key) {
+      var slot = timeSlots[key];
+      if (slot.meds.length > 0 && slot.hour > currentHour && !nextTime) {
+        nextTime = timeMap[slot.hour] || slot.hour + ':00';
+      }
+    });
+    realNextTime.textContent = nextTime || '今日已完成';
+  }
+
   // 更新进度条（真实数据区域）
   var fill = document.getElementById('realProgFill');
   var text = document.getElementById('realProgText');
