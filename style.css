@@ -3054,6 +3054,41 @@ input { font-family: inherit; font-size: inherit; }
 }
 .auth-skip:active { color: var(--primary); }
 
+/* 新用户引导 */
+.ob-steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-bottom: 24px;
+}
+.ob-step {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+  background: var(--border); color: var(--text-sec);
+  transition: all .3s;
+}
+.ob-step.active { background: var(--primary); color: #fff; }
+.ob-step.done { background: var(--primary-light); color: var(--primary); }
+.ob-line { width: 40px; height: 2px; background: var(--border); }
+
+.ob-disease-grid {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+}
+.ob-disease-btn {
+  padding: 10px 18px; border-radius: 20px;
+  font-size: 14px; background: var(--bg); color: var(--text);
+  border: 1.5px solid var(--border); transition: all .2s; cursor: pointer;
+}
+.ob-disease-btn.selected {
+  background: var(--primary-light); border-color: var(--primary);
+  color: var(--primary-dark); font-weight: 600;
+}
+.ob-disease-btn:active { transform: scale(.95); }
+
+.ob-btn-row {
+  display: flex; gap: 12px; margin-top: 16px;
+}
+.ob-btn-row .btn-primary-lg, .ob-btn-row .btn-secondary-lg { flex: 1; }
+
 /* 邀请码 */
 .invite-code-box {
   text-align: center; padding: 20px;

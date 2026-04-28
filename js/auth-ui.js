@@ -27,6 +27,7 @@ async function checkAuthState() {
     if (typeof loadFromCloud === 'function') await loadFromCloud();
     if (typeof initPush === 'function') initPush();
     if (typeof initMedData === 'function') await initMedData();
+    if (typeof checkOnboarding === 'function') await checkOnboarding();
   }
   // 未登录，显示登录弹窗（默认已显示）
 
@@ -106,6 +107,7 @@ async function handleLogin() {
       if (typeof initPush === 'function') initPush();
       if (typeof initMedData === 'function') await initMedData();
       updateUserDisplay(result.data.user);
+      if (typeof checkOnboarding === 'function') await checkOnboarding();
       showToast('数据同步完成');
     }
   } catch(e) {

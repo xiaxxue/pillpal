@@ -77,6 +77,107 @@
         <div id="authError" style="display:none;color:var(--danger);font-size:13px;text-align:center;margin-top:12px"></div>
       </div>
     </div>
+    <!-- ===== 新用户引导 ===== -->
+    <div class="modal-overlay" id="onboardModal">
+      <div class="modal-content">
+        <!-- 步骤指示器 -->
+        <div class="ob-steps">
+          <div class="ob-step active" id="obStep1">1</div>
+          <div class="ob-line"></div>
+          <div class="ob-step" id="obStep2">2</div>
+          <div class="ob-line"></div>
+          <div class="ob-step" id="obStep3">3</div>
+        </div>
+
+        <!-- 第1步：基本信息 -->
+        <div class="ob-panel" id="obPanel1">
+          <h3>欢迎使用 PillPal!</h3>
+          <p style="color:var(--text-sec);font-size:14px;margin-bottom:20px">先完善一下个人信息，方便我们更好地为你服务</p>
+          <div class="form-group">
+            <label class="form-label">你的称呼</label>
+            <input type="text" class="form-input" id="obName" placeholder="如：张叔叔、小王">
+          </div>
+          <div class="form-group">
+            <label class="form-label">年龄</label>
+            <input type="number" class="form-input" id="obAge" placeholder="如：58">
+          </div>
+          <div class="form-group">
+            <label class="form-label">性别</label>
+            <div class="relation-picker">
+              <button class="relation-opt selected" onclick="pickObGender(this, 'male')">男</button>
+              <button class="relation-opt" onclick="pickObGender(this, 'female')">女</button>
+            </div>
+          </div>
+          <button class="btn-primary-lg" style="width:100%;margin-top:12px" onclick="obNext(1)">下一步</button>
+        </div>
+
+        <!-- 第2步：疾病信息 -->
+        <div class="ob-panel" id="obPanel2" style="display:none">
+          <h3>你有哪些慢性病？</h3>
+          <p style="color:var(--text-sec);font-size:14px;margin-bottom:20px">可多选，帮助我们给你更准确的用药建议</p>
+          <div class="ob-disease-grid">
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">高血压</button>
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">2型糖尿病</button>
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">高血脂</button>
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">冠心病</button>
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">心律不齐</button>
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">甲状腺疾病</button>
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">痛风</button>
+            <button class="ob-disease-btn" onclick="this.classList.toggle('selected')">其他</button>
+          </div>
+          <div class="ob-btn-row">
+            <button class="btn-secondary-lg" onclick="obBack(2)">上一步</button>
+            <button class="btn-primary-lg" onclick="obNext(2)">下一步</button>
+          </div>
+        </div>
+
+        <!-- 第3步：添加第一种药 -->
+        <div class="ob-panel" id="obPanel3" style="display:none">
+          <h3>添加你的第一种药</h3>
+          <p style="color:var(--text-sec);font-size:14px;margin-bottom:20px">以后还可以在首页随时添加更多</p>
+          <div class="form-group">
+            <label class="form-label">药品名称</label>
+            <input type="text" class="form-input" id="obMedName" placeholder="如：氨氯地平片">
+          </div>
+          <div class="form-group">
+            <label class="form-label">单次剂量</label>
+            <input type="text" class="form-input" id="obMedDosage" placeholder="如：5mg × 1片">
+          </div>
+          <div class="form-group">
+            <label class="form-label">什么时候吃（可多选）</label>
+            <div class="relation-picker" id="obTimePicker">
+              <button class="relation-opt" onclick="this.classList.toggle('selected')">晨起 7:00</button>
+              <button class="relation-opt" onclick="this.classList.toggle('selected')">早餐后 8:00</button>
+              <button class="relation-opt" onclick="this.classList.toggle('selected')">午餐后 14:30</button>
+              <button class="relation-opt" onclick="this.classList.toggle('selected')">晚间 21:00</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">服用条件</label>
+            <div class="relation-picker" id="obCondPicker">
+              <button class="relation-opt selected" onclick="pickObCond(this)">空腹</button>
+              <button class="relation-opt" onclick="pickObCond(this)">餐后30分钟</button>
+              <button class="relation-opt" onclick="pickObCond(this)">睡前</button>
+              <button class="relation-opt" onclick="pickObCond(this)">无要求</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">治什么病</label>
+            <input type="text" class="form-input" id="obMedDisease" placeholder="如：高血压">
+          </div>
+          <div class="form-group">
+            <label class="form-label">家里还剩多少片</label>
+            <input type="number" class="form-input" id="obMedStock" placeholder="如：30" value="30">
+          </div>
+          <div class="ob-btn-row">
+            <button class="btn-secondary-lg" onclick="obBack(3)">上一步</button>
+            <button class="btn-primary-lg" onclick="obFinish()">完成设置</button>
+          </div>
+          <div class="auth-skip" onclick="obSkipMed()">先跳过，稍后添加</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== 启动角色选择页 ===== -->
     <div class="page active" id="page-launch">
       <div class="launch-logo-area">
@@ -2399,6 +2500,7 @@
   <script src="js/auth-ui.js"></script>
   <script src="js/push.js"></script>
   <script src="js/med-manager.js"></script>
+  <script src="js/onboard.js"></script>
   <script>
   // 注册 Service Worker
   if ('serviceWorker' in navigator) {
