@@ -34,7 +34,14 @@ async function addMedication(med) {
   var user = await getCurrentUser();
   if (user) {
     med.user_id = user.id;
+    console.log('添加药品到数据库:', JSON.stringify(med));
     var result = await sb.from('medications').insert(med).select().single();
+    console.log('添加结果:', JSON.stringify(result));
+    if (result.error) {
+      console.error('添加失败:', result.error.message);
+      showToast('添加失败：' + result.error.message);
+      return null;
+    }
     return result.data;
   }
   // 离线模式
