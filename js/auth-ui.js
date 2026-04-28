@@ -158,18 +158,22 @@ function updateUserDisplay(user) {
   if (!user) return;
   var name = (user.user_metadata && user.user_metadata.display_name) || user.email.split('@')[0];
   var initial = name.charAt(0);
+  var hour = new Date().getHours();
+  var timeStr = hour < 6 ? '凌晨好' : hour < 12 ? '上午好' : hour < 18 ? '下午好' : '晚上好';
 
-  // 首页问候
-  var greetingName = document.querySelector('.greeting-name');
-  if (greetingName) {
-    var hour = new Date().getHours();
-    var timeStr = hour < 6 ? '凌晨好' : hour < 12 ? '上午好' : hour < 18 ? '下午好' : '晚上好';
-    greetingName.textContent = timeStr + '，' + name;
-  }
+  // 首页顶栏
+  var homeAvatar = document.getElementById('homeAvatar');
+  if (homeAvatar) homeAvatar.textContent = initial;
+  var homeGreeting = document.getElementById('homeGreeting');
+  if (homeGreeting) homeGreeting.textContent = timeStr + '，' + name;
+  var homeSub = document.getElementById('homeSub');
+  if (homeSub) homeSub.textContent = '欢迎使用 PillPal';
+  var miniText = document.getElementById('miniText');
+  if (miniText) miniText.textContent = name + ' · PillPal';
 
-  // 首页头像
-  var avatar = document.querySelector('.avatar');
-  if (avatar) avatar.textContent = initial;
+  // 显示 AI 建议区
+  var topBarAi = document.getElementById('topBarAi');
+  if (topBarAi) topBarAi.style.display = '';
 
   // 个人中心
   var profileName = document.querySelector('.profile-name');

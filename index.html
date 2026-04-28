@@ -105,30 +105,28 @@
         <div class="top-bar-full">
           <div class="greeting-row">
             <div class="greeting">
-              <div class="avatar" onclick="switchTab('tab-profile')">张</div>
+              <div class="avatar" id="homeAvatar" onclick="switchTab('tab-profile')">你</div>
               <div>
-                <div class="greeting-name">下午好，张叔叔</div>
-                <div class="greeting-sub">高血压 · 2型糖尿病 · 用药第 86 天</div>
+                <div class="greeting-name" id="homeGreeting">你好</div>
+                <div class="greeting-sub" id="homeSub">欢迎使用 PillPal</div>
               </div>
             </div>
             <div class="score-badge" id="scoreBtn">
-              <span class="score-num">92</span>
-              <span class="score-label">吃药评分 · 优秀</span>
+              <span class="score-num" id="homeScore">-</span>
+              <span class="score-label">吃药评分</span>
             </div>
           </div>
-          <div class="top-bar-ai">
+          <div class="top-bar-ai" id="topBarAi" style="display:none">
             <div class="ai-suggest-card" onclick="switchTab('tab-ai')">
               <div class="ai-avatar">&#129432;</div>
-              <div class="ai-text">
-                <p>&#127793; 本周服药率 <strong>92%</strong>，比上周提升 3%，继续保持！</p>
-                <p>&#127777; 今日气温骤降至 12°C，高血压患者注意保暖，建议推迟晨练</p>
-                <p>&#128197; 距下次复诊还有 <strong>15 天</strong>，建议开始记录每日血压数据</p>
+              <div class="ai-text" id="aiSuggestText">
+                <p>点击这里和小团聊聊用药问题</p>
               </div>
             </div>
           </div>
         </div>
         <div class="top-bar-mini" id="topBarMini" onclick="expandTopBar()">
-          <span class="mini-text">张叔叔 · 吃药评分 92 优秀</span>
+          <span class="mini-text" id="miniText">PillPal 用药管家</span>
           <span class="mini-arrow">&#9660;</span>
         </div>
       </header>
