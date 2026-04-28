@@ -232,17 +232,38 @@ function updateStockFromMeds(meds) {
   if (boItems[2]) boItems[2].querySelector('.bo-num').textContent = totalWeekly;
 }
 
-// 页面加载后检查是否有药品
+// 页面加载后：登录用户清除假数据，显示真实数据
 async function initMedData() {
   var user = await getCurrentUser();
-  if (!user) return; // 未登录用原始假数据
+  if (!user) return; // 未登录保留原始假数据作为演示
 
+  // 清除首页写死的假数据
+  var timeline = document.querySelector('.med-timeline');
+  if (timeline) timeline.innerHTML = '';
+
+  // 清除库存页写死的假数据
+  var boxList = document.querySelector('#page-box .box-list');
+  if (boxList) boxList.innerHTML = '';
+
+  // 清除风险提醒
+  var riskAlerts = document.querySelector('#page-home .risk-alerts');
+  if (riskAlerts) riskAlerts.innerHTML = '';
+
+  // 重置概览卡数据
+  var doneEl = document.querySelector('.s-card-num .done');
+  if (doneEl) doneEl.textContent = '0';
+
+  // 从数据库加载药品
   var meds = await getMedications();
   if (meds.length > 0) {
     await refreshTimeline();
   } else {
-    // 显示空状态
+    // 没有药品，显示空状态，隐藏其他内容
     var emptyState = document.getElementById('emptyState');
     if (emptyState) emptyState.style.display = '';
+
+    // 隐藏概览和进度条
+    var sections = document.querySelectorAll('#page-home .today-summary, #page-home .med-progress, #page-home .date-month-label, #page-home .date-picker');
+    sections.forEach(function(el) { el.style.display = 'none'; });
   }
 }
