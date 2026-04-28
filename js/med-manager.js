@@ -408,13 +408,21 @@ function generateRiskAlerts(meds) {
 
   // 更新概览卡的"最近断药"
   var warnCard = document.getElementById('realMinDays');
+  var warnLabel = document.getElementById('realMinDaysLabel');
   if (warnCard) {
     var minDays = 999;
+    var minDrugName = '';
     meds.forEach(function(med) {
       var daily = med.daily_usage || 1;
       var days = med.stock_count > 0 ? Math.floor(med.stock_count / daily) : 0;
-      if (days < minDays) minDays = days;
+      if (days < minDays) { minDays = days; minDrugName = med.name; }
     });
-    warnCard.textContent = minDays < 999 ? minDays + '天' : '-天';
+    if (minDays < 999) {
+      warnCard.textContent = minDays + '天';
+      if (warnLabel) warnLabel.textContent = minDrugName;
+    } else {
+      warnCard.textContent = '-';
+      if (warnLabel) warnLabel.textContent = '库存充足';
+    }
   }
 }
