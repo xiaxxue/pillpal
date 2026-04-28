@@ -232,38 +232,95 @@ function updateStockFromMeds(meds) {
   if (boItems[2]) boItems[2].querySelector('.bo-num').textContent = totalWeekly;
 }
 
-// 页面加载后：登录用户清除假数据，显示真实数据
+// 页面加载后：登录用户清除所有假数据，显示真实数据
 async function initMedData() {
   var user = await getCurrentUser();
-  if (!user) return; // 未登录保留原始假数据作为演示
+  if (!user) return; // 未登录保留假数据作为演示
 
-  // 清除首页写死的假数据
+  // === 清除所有页面的写死假数据 ===
+
+  // 首页：时间轴、风险提醒、AI建议
   var timeline = document.querySelector('.med-timeline');
   if (timeline) timeline.innerHTML = '';
-
-  // 清除库存页写死的假数据
-  var boxList = document.querySelector('#page-box .box-list');
-  if (boxList) boxList.innerHTML = '';
-
-  // 清除风险提醒
   var riskAlerts = document.querySelector('#page-home .risk-alerts');
   if (riskAlerts) riskAlerts.innerHTML = '';
+  var aiSuggest = document.querySelector('.ai-suggest-block');
+  if (aiSuggest) aiSuggest.style.display = 'none';
+  // 最近问诊卡
+  var visitCard = document.querySelector('#page-home .visit-card');
+  if (visitCard) visitCard.closest('.section-block').style.display = 'none';
+
+  // 库存页：清空药品列表和重复购药提醒
+  var boxList = document.querySelector('#page-box .box-list');
+  if (boxList) boxList.innerHTML = '';
+  var dupAlert = document.querySelector('#page-box .dup-alert');
+  if (dupAlert) dupAlert.style.display = 'none';
+
+  // 问诊页：续方进度、准备清单（这些依赖具体药品，清掉）
+  var renewSteps = document.querySelector('.renew-steps');
+  if (renewSteps) renewSteps.closest('.section-block').style.display = 'none';
+  var renewChecklist = document.querySelectorAll('#page-renew .checklist');
+  renewChecklist.forEach(function(el) { el.closest('.section-block').style.display = 'none'; });
 
   // 重置概览卡数据
   var doneEl = document.querySelector('.s-card-num .done');
   if (doneEl) doneEl.textContent = '0';
+  var warnCard = document.querySelector('.s-card.warn .s-card-num');
+  if (warnCard) warnCard.textContent = '-';
 
-  // 从数据库加载药品
+  // === 从数据库加载真实数据 ===
   var meds = await getMedications();
+
   if (meds.length > 0) {
     await refreshTimeline();
+    // 生成风险提醒
+    generateRiskAlerts(meds);
   } else {
-    // 没有药品，显示空状态，隐藏其他内容
+    // 没有药品，显示空状态
     var emptyState = document.getElementById('emptyState');
     if (emptyState) emptyState.style.display = '';
-
     // 隐藏概览和进度条
     var sections = document.querySelectorAll('#page-home .today-summary, #page-home .med-progress, #page-home .date-month-label, #page-home .date-picker');
     sections.forEach(function(el) { el.style.display = 'none'; });
+
+    // 库存页也显示空状态
+    if (boxList) boxList.innerHTML = '<div class="empty-state" style="padding:40px 0"><div class="empty-icon">📦</div><div class="empty-title">还没有药品</div><div class="empty-desc">添加药品后这里会显示库存信息</div></div>';
+  }
+}
+
+// 根据药品库存生成风险提醒
+function generateRiskAlerts(meds) {
+  var riskAlerts = document.querySelector('#page-home .risk-alerts');
+  if (!riskAlerts) return;
+
+  var html = '';
+  meds.forEach(function(med) {
+    var daily = med.daily_usage || 1;
+    var days = med.stock_count > 0 ? Math.floor(med.stock_count / daily) : 0;
+
+    if (days <= 7) {
+      html += '<div class="alert-card risk-orange">' +
+        '<div class="alert-icon">&#9888;</div>' +
+        '<div class="alert-body">' +
+          '<div class="alert-title">' + escapeHtml(med.name) + '快吃完了</div>' +
+          '<div class="alert-desc">剩余 ' + med.stock_count + ' 片，预计 ' + days + ' 天后用完，建议续方</div>' +
+        '</div>' +
+        '<button class="alert-action" onclick="switchTab(\'tab-renew\')">去续方</button>' +
+      '</div>';
+    }
+  });
+
+  riskAlerts.innerHTML = html;
+
+  // 更新概览卡的"最近断药"
+  var warnCard = document.querySelector('.s-card.warn .s-card-num');
+  if (warnCard) {
+    var minDays = 999;
+    meds.forEach(function(med) {
+      var daily = med.daily_usage || 1;
+      var days = med.stock_count > 0 ? Math.floor(med.stock_count / daily) : 0;
+      if (days < minDays) minDays = days;
+    });
+    warnCard.textContent = minDays < 999 ? minDays + '天' : '-';
   }
 }
