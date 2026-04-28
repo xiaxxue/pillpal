@@ -3090,3 +3090,11 @@ input { font-family: inherit; font-size: inherit; }
   font-size: 20px; color: var(--text-third); background: none;
   padding: 4px; flex-shrink: 0;
 }
+
+/* 空状态引导 */
+.empty-state {
+  text-align: center; padding: 60px 24px 40px;
+}
+.empty-icon { font-size: 64px; margin-bottom: 16px; }
+.empty-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.empty-desc { font-size: 14px; color: var(--text-sec); line-height: 1.6; }

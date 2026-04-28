@@ -135,6 +135,16 @@
 
       <main class="content">
 
+        <!-- 空状态引导（没有药品时显示） -->
+        <div class="empty-state" id="emptyState" style="display:none">
+          <div class="empty-icon">💊</div>
+          <div class="empty-title">还没有添加药品</div>
+          <div class="empty-desc">添加你正在服用的药品，PillPal 帮你管理每日用药</div>
+          <button class="btn-primary-lg" style="width:100%;margin-top:16px" onclick="openAddMedModal()">
+            + 添加第一种药品
+          </button>
+        </div>
+
         <!-- 今日概览 -->
         <section class="today-summary">
           <div class="summary-cards">
@@ -983,11 +993,19 @@
           </div>
         </div>
 
-        <!-- 其��� -->
+        <!-- 其他 -->
         <div class="panel-section">
           <div class="panel-section-title">&#9881; 其他</div>
+          <div class="notify-row" onclick="openAddMedModal()" style="cursor:pointer">
+            <div><div class="notify-title">添加新药品</div></div>
+            <span class="notify-arrow">&rsaquo;</span>
+          </div>
           <div class="notify-row" onclick="openMedData()" style="cursor:pointer">
             <div><div class="notify-title">用药数据</div></div>
+            <span class="notify-arrow">&rsaquo;</span>
+          </div>
+          <div class="notify-row" onclick="handleLogout()" style="cursor:pointer">
+            <div><div class="notify-title" style="color:var(--danger)">退出登录</div></div>
             <span class="notify-arrow">&rsaquo;</span>
           </div>
         </div>
@@ -1612,6 +1630,61 @@
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
+
+    <!-- 添加药品弹窗 -->
+    <div class="modal-overlay" id="addMedModal" onclick="if(event.target===this)this.classList.remove('show')">
+      <div class="modal-content modal-lg">
+        <div class="modal-close" onclick="document.getElementById('addMedModal').classList.remove('show')">&times;</div>
+        <h3>添加药品</h3>
+        <div class="form-group">
+          <label class="form-label">药品名称</label>
+          <input type="text" class="form-input" id="addMedName" placeholder="如：氨氯地平片">
+        </div>
+        <div class="form-group">
+          <label class="form-label">单次剂量</label>
+          <input type="text" class="form-input" id="addMedDosage" placeholder="如：5mg × 1片">
+        </div>
+        <div class="form-group">
+          <label class="form-label">每天吃几次</label>
+          <div class="relation-picker" id="addMedFreqPicker">
+            <button class="relation-opt selected" onclick="pickAddMedFreq(this)">1次</button>
+            <button class="relation-opt" onclick="pickAddMedFreq(this)">2次</button>
+            <button class="relation-opt" onclick="pickAddMedFreq(this)">3次</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">什么时候吃（可多选）</label>
+          <div class="relation-picker" id="addMedTimePicker">
+            <button class="relation-opt" onclick="this.classList.toggle('selected')">晨起 7:00</button>
+            <button class="relation-opt" onclick="this.classList.toggle('selected')">早餐后 8:00</button>
+            <button class="relation-opt" onclick="this.classList.toggle('selected')">午餐后 14:30</button>
+            <button class="relation-opt" onclick="this.classList.toggle('selected')">晚间 21:00</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">服用条件</label>
+          <div class="relation-picker" id="addMedCondPicker">
+            <button class="relation-opt selected" onclick="pickAddMedCond(this)">空腹</button>
+            <button class="relation-opt" onclick="pickAddMedCond(this)">餐后30分钟</button>
+            <button class="relation-opt" onclick="pickAddMedCond(this)">睡前</button>
+            <button class="relation-opt" onclick="pickAddMedCond(this)">无要求</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">治什么病</label>
+          <input type="text" class="form-input" id="addMedDisease" placeholder="如：高血压">
+        </div>
+        <div class="form-group">
+          <label class="form-label">当前库存（片）</label>
+          <input type="number" class="form-input" id="addMedStock" placeholder="如：30" value="30">
+        </div>
+        <div class="form-group">
+          <label class="form-label">注意事项 <span style="color:var(--text-third);font-weight:400">（选填）</span></label>
+          <input type="text" class="form-input" id="addMedNote" placeholder="如：避免与葡萄柚汁同服">
+        </div>
+        <button class="btn-primary-lg" style="width:100%;margin-top:12px" onclick="handleAddMed()">添加到用药计划</button>
+      </div>
+    </div>
 
     <!-- PWA 安装提示条 -->
     <div class="install-bar" id="installBar" style="display:none">
@@ -2272,6 +2345,7 @@
   <script src="app.js"></script>
   <script src="js/auth-ui.js"></script>
   <script src="js/push.js"></script>
+  <script src="js/med-manager.js"></script>
   <script>
   // 注册 Service Worker
   if ('serviceWorker' in navigator) {

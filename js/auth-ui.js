@@ -22,9 +22,11 @@ async function checkAuthState() {
   var user = await getCurrentUser();
   if (user) {
     hideAuthModal();
+    updateUserDisplay(user);
     await migrateLocalData();
     if (typeof loadFromCloud === 'function') await loadFromCloud();
     if (typeof initPush === 'function') initPush();
+    if (typeof initMedData === 'function') await initMedData();
   }
   // 未登录，显示登录弹窗（默认已显示）
 
@@ -102,6 +104,8 @@ async function handleLogin() {
       await migrateLocalData();
       if (typeof loadFromCloud === 'function') await loadFromCloud();
       if (typeof initPush === 'function') initPush();
+      if (typeof initMedData === 'function') await initMedData();
+      updateUserDisplay(result.data.user);
       showToast('数据同步完成');
     }
   } catch(e) {
@@ -147,6 +151,31 @@ async function handleSignup() {
 function skipAuth() {
   hideAuthModal();
   showToast('体验模式：数据仅保存在本地');
+}
+
+// 更新页面上的用户信息
+function updateUserDisplay(user) {
+  if (!user) return;
+  var name = (user.user_metadata && user.user_metadata.display_name) || user.email.split('@')[0];
+  var initial = name.charAt(0);
+
+  // 首页问候
+  var greetingName = document.querySelector('.greeting-name');
+  if (greetingName) {
+    var hour = new Date().getHours();
+    var timeStr = hour < 6 ? '凌晨好' : hour < 12 ? '上午好' : hour < 18 ? '下午好' : '晚上好';
+    greetingName.textContent = timeStr + '，' + name;
+  }
+
+  // 首页头像
+  var avatar = document.querySelector('.avatar');
+  if (avatar) avatar.textContent = initial;
+
+  // 个人中心
+  var profileName = document.querySelector('.profile-name');
+  if (profileName) profileName.textContent = name;
+  var profileAvatar = document.querySelector('.profile-avatar');
+  if (profileAvatar) profileAvatar.textContent = initial;
 }
 
 // 退出登录（在个人中心调用）
