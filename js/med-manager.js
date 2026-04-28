@@ -232,6 +232,10 @@ async function refreshTimeline() {
     }
   });
 
+  // 读取今日打卡记录
+  var todayRecords = medRecords; // 来自 app.js 的全局变量
+  var doneCount = 0;
+
   // 生成时间轴 HTML（写入真实数据区域）
   var timeline = document.getElementById('realTimeline');
   if (!timeline) return;
@@ -240,6 +244,8 @@ async function refreshTimeline() {
   var now = new Date();
   var currentHour = now.getHours() + now.getMinutes() / 60;
   var totalMeds = 0;
+  var nextTime = null;
+  var timeMap = { 7: '07:00', 8: '08:00', 14.5: '14:30', 18.5: '18:30', 21: '21:00' };
 
   Object.keys(timeSlots).forEach(function(key) {
     var slot = timeSlots[key];
@@ -256,21 +262,63 @@ async function refreshTimeline() {
 
     slot.meds.forEach(function(med) {
       totalMeds++;
-      var cardClass = isCurrent ? 'active-card' : (isPast ? 'past-card' : 'upcoming-card');
-      html += '<div class="med-card ' + cardClass + '" data-med-id="' + (med.id || '') + '">';
-      html += '<div class="mc-left">';
-      html += '<div class="mc-name">' + escapeHtml(med.name) + '</div>';
-      html += '<div class="mc-detail">' + escapeHtml(med.dosage) + ' · ' + escapeHtml(med.condition) + '</div>';
-      html += '<div class="mc-disease">' + escapeHtml(med.disease) + '</div>';
-      if (med.note) html += '<div class="mc-note">&#9432; ' + escapeHtml(med.note) + '</div>';
-      html += '</div>';
-      html += '<div class="mc-actions">';
-      html += '<button class="btn-take-full" onclick="takeMedCard(this)">&#10003; 已服用</button>';
-      html += '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>';
-      html += '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>';
-      html += '</div>';
-      html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
-      html += '</div>';
+      // 检查此药此时段是否已打卡
+      var medKey = med.name + '_' + slot.hour;
+      var record = todayRecords[medKey];
+      var isDone = record && record.startsWith('done_');
+      var isSkipped = record && record.startsWith('skip_');
+
+      if (isDone) doneCount++;
+
+      if (isDone) {
+        // 已服用状态
+        var takenTime = record.replace('done_', '');
+        html += '<div class="med-card done" data-med-id="' + (med.id || '') + '" style="flex-direction:row">';
+        html += '<div class="mc-left">';
+        html += '<div class="mc-name">' + escapeHtml(med.name) + '</div>';
+        html += '<div class="mc-detail">' + escapeHtml(med.dosage) + ' · ' + escapeHtml(med.condition) + '</div>';
+        html += '<div class="mc-disease">' + escapeHtml(med.disease) + '</div>';
+        html += '</div>';
+        html += '<div class="mc-right">';
+        html += '<span class="mc-status-done">&#10003; ' + takenTime + '</span>';
+        html += '<button class="btn-undo" onclick="undoMed(this)">撤回</button>';
+        html += '</div>';
+        html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
+        html += '</div>';
+      } else if (isSkipped) {
+        // 已跳过状态
+        var reason = record.replace('skip_', '');
+        html += '<div class="med-card done" data-med-id="' + (med.id || '') + '" style="flex-direction:row;opacity:0.5">';
+        html += '<div class="mc-left">';
+        html += '<div class="mc-name">' + escapeHtml(med.name) + '</div>';
+        html += '<div class="mc-detail">' + escapeHtml(med.dosage) + '</div>';
+        html += '</div>';
+        html += '<div class="mc-right"><span class="mc-status-done" style="color:var(--text-third)">已跳过 · ' + reason + '</span></div>';
+        html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
+        html += '</div>';
+      } else {
+        // 未打卡状态
+        var cardClass = isCurrent ? 'active-card' : (isPast ? 'past-card' : 'upcoming-card');
+        html += '<div class="med-card ' + cardClass + '" data-med-id="' + (med.id || '') + '">';
+        html += '<div class="mc-left">';
+        html += '<div class="mc-name">' + escapeHtml(med.name) + '</div>';
+        html += '<div class="mc-detail">' + escapeHtml(med.dosage) + ' · ' + escapeHtml(med.condition) + '</div>';
+        html += '<div class="mc-disease">' + escapeHtml(med.disease) + '</div>';
+        if (med.note) html += '<div class="mc-note">&#9432; ' + escapeHtml(med.note) + '</div>';
+        html += '</div>';
+        html += '<div class="mc-actions">';
+        html += '<button class="btn-take-full" onclick="takeMedCard(this)">&#10003; 已服用</button>';
+        html += '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>';
+        html += '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>';
+        html += '</div>';
+        html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
+        html += '</div>';
+
+        // 未打卡 + 时间未过 = 下一个提醒
+        if (!nextTime && slot.hour > currentHour) {
+          nextTime = timeMap[slot.hour];
+        }
+      }
     });
 
     html += '</div>';
@@ -281,29 +329,24 @@ async function refreshTimeline() {
   // 更新下次提醒时间
   var realNextTime = document.getElementById('realNextTime');
   if (realNextTime) {
-    var now = new Date();
-    var currentHour = now.getHours() + now.getMinutes() / 60;
-    var nextTime = null;
-    var timeMap = { 7: '07:00', 8: '08:00', 14.5: '14:30', 18.5: '18:30', 21: '21:00' };
-    Object.keys(timeSlots).forEach(function(key) {
-      var slot = timeSlots[key];
-      if (slot.meds.length > 0 && slot.hour > currentHour && !nextTime) {
-        nextTime = timeMap[slot.hour] || slot.hour + ':00';
-      }
-    });
-    realNextTime.textContent = nextTime || '今日已完成';
+    if (doneCount >= totalMeds) {
+      realNextTime.textContent = '全部完成';
+    } else {
+      realNextTime.textContent = nextTime || '待打卡';
+    }
   }
 
-  // 更新进度条（真实数据区域）
+  // 更新进度条
   var fill = document.getElementById('realProgFill');
   var text = document.getElementById('realProgText');
-  if (fill) fill.style.width = '0%';
-  if (text) text.textContent = '已完成 0/' + totalMeds + ' 次服药';
+  var pct = totalMeds > 0 ? Math.round(doneCount / totalMeds * 100) : 0;
+  if (fill) fill.style.width = pct + '%';
+  if (text) text.textContent = '已完成 ' + doneCount + '/' + totalMeds + ' 次服药';
 
-  // 更新概览卡（真实数据区域）
+  // 更新概览卡
   var realDone = document.getElementById('realDone');
   var realTotal = document.getElementById('realTotal');
-  if (realDone) realDone.textContent = '0';
+  if (realDone) realDone.textContent = doneCount;
   if (realTotal) realTotal.textContent = totalMeds;
 
   // 更新库存、风险提醒、顶栏
