@@ -61,6 +61,7 @@ function setupLocalReminders() {
     { hour: 7, min: 0, label: '晨起', drugs: '氨氯地平片、阿司匹林肠溶片' },
     { hour: 8, min: 0, label: '早餐后', drugs: '盐酸二甲双胍片' },
     { hour: 14, min: 30, label: '午餐后', drugs: '盐酸二甲双胍片' },
+    { hour: 18, min: 30, label: '晚餐后', drugs: '请查看用药计划' },
     { hour: 21, min: 0, label: '晚间', drugs: '盐酸二甲双胍片、阿托伐他汀钙片' }
   ];
 

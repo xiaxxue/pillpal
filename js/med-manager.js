@@ -204,6 +204,7 @@ async function refreshTimeline() {
     '晨起 7:00': { hour: 7, icon: '&#9728;', label: '晨起 · 07:00', meds: [] },
     '早餐后 8:00': { hour: 8, icon: '&#127860;', label: '早餐后 · 08:00', meds: [] },
     '午餐后 14:30': { hour: 14.5, icon: '&#9728;', label: '午餐后 · 14:30', meds: [] },
+    '晚餐后 18:30': { hour: 18.5, icon: '&#127869;', label: '晚餐后 · 18:30', meds: [] },
     '晚间 21:00': { hour: 21, icon: '&#127769;', label: '晚间 · 21:00', meds: [] }
   };
 
@@ -268,7 +269,7 @@ async function refreshTimeline() {
     var now = new Date();
     var currentHour = now.getHours() + now.getMinutes() / 60;
     var nextTime = null;
-    var timeMap = { 7: '07:00', 8: '08:00', 14.5: '14:30', 21: '21:00' };
+    var timeMap = { 7: '07:00', 8: '08:00', 14.5: '14:30', 18.5: '18:30', 21: '21:00' };
     Object.keys(timeSlots).forEach(function(key) {
       var slot = timeSlots[key];
       if (slot.meds.length > 0 && slot.hour > currentHour && !nextTime) {
