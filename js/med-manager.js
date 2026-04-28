@@ -282,8 +282,10 @@ async function refreshTimeline() {
   if (realDone) realDone.textContent = '0';
   if (realTotal) realTotal.textContent = totalMeds;
 
-  // 更新库存
+  // 更新库存、风险提醒、顶栏
   updateStockFromMeds(meds);
+  generateRiskAlerts(meds);
+  updateTopBarWithData(meds);
 }
 
 // 更新库存页面（写入真实数据区域）
