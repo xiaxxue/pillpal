@@ -1,7 +1,7 @@
 // ====== Service Worker ======
 // 负责离线缓存和推送通知
 
-var CACHE_NAME = 'pillpal-v1';
+var CACHE_NAME = 'pillpal-v2';
 var ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ var ASSETS = [
   './js/supabase-client.js',
   './js/db.js',
   './js/auth-ui.js',
+  './js/push.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'

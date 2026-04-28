@@ -24,6 +24,7 @@ async function checkAuthState() {
     hideAuthModal();
     await migrateLocalData();
     if (typeof loadFromCloud === 'function') await loadFromCloud();
+    if (typeof initPush === 'function') initPush();
   }
   // 未登录，显示登录弹窗（默认已显示）
 
@@ -100,6 +101,7 @@ async function handleLogin() {
       showToast('登录成功，正在同步数据...');
       await migrateLocalData();
       if (typeof loadFromCloud === 'function') await loadFromCloud();
+      if (typeof initPush === 'function') initPush();
       showToast('数据同步完成');
     }
   } catch(e) {
