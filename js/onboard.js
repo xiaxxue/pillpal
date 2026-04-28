@@ -90,11 +90,19 @@ async function obFinish() {
   var medStock = parseInt(document.getElementById('obMedStock').value) || 30;
 
   if (medName && medDosage) {
-    // 检查重复
+    // 检查重复（同名+同时间段）
     var existingMeds = await getMedications();
-    var dup = existingMeds.find(function(m) { return m.name === medName; });
+    var times = [];
+    document.querySelectorAll('#obTimePicker .relation-opt.selected').forEach(function(b) {
+      times.push(b.textContent.trim());
+    });
+    var dup = existingMeds.find(function(m) {
+      if (m.name !== medName) return false;
+      var overlap = times.filter(function(t) { return m.times && m.times.indexOf(t) !== -1; });
+      return overlap.length > 0;
+    });
     if (dup) {
-      showToast(medName + ' 已存在，跳过添加');
+      showToast(medName + ' 在该时间段已存在，跳过添加');
     } else {
     var times = [];
     document.querySelectorAll('#obTimePicker .relation-opt.selected').forEach(function(b) {

@@ -140,14 +140,6 @@ async function handleAddMed() {
   if (!name) { showToast('请输入药品名称'); return; }
   if (!dosage) { showToast('请输入剂量'); return; }
 
-  // 检查重复：同名药品+同时间段不允许重复添加
-  var existingMeds = await getMedications();
-  var duplicate = existingMeds.find(function(m) { return m.name === name; });
-  if (duplicate) {
-    showToast(name + ' 已经在用药计划中，无需重复添加');
-    return;
-  }
-
   // 频次
   var freqBtn = document.querySelector('#addMedFreqPicker .relation-opt.selected');
   var frequency = freqBtn ? parseInt(freqBtn.textContent) : 1;
@@ -158,6 +150,19 @@ async function handleAddMed() {
     times.push(b.textContent.trim());
   });
   if (times.length === 0) { showToast('请选择服用时间'); return; }
+
+  // 检查重复：同名药品+完全相同的时间段才算重复
+  var existingMeds = await getMedications();
+  var duplicate = existingMeds.find(function(m) {
+    if (m.name !== name) return false;
+    // 检查时间是否完全重叠
+    var overlap = times.filter(function(t) { return m.times && m.times.indexOf(t) !== -1; });
+    return overlap.length > 0;
+  });
+  if (duplicate) {
+    showToast(name + ' 在该时间段已存在，请选择其他时间');
+    return;
+  }
 
   // 条件
   var condBtn = document.querySelector('#addMedCondPicker .relation-opt.selected');
