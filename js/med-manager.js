@@ -120,8 +120,8 @@ async function refreshTimeline() {
     }
   });
 
-  // 生成时间轴 HTML
-  var timeline = document.querySelector('.med-timeline');
+  // 生成时间轴 HTML（写入真实数据区域）
+  var timeline = document.getElementById('realTimeline');
   if (!timeline) return;
 
   var html = '';
@@ -165,25 +165,25 @@ async function refreshTimeline() {
 
   timeline.innerHTML = html;
 
-  // 更新进度条
-  var fill = document.querySelector('.prog-fill');
-  var text = document.querySelector('.prog-text');
+  // 更新进度条（真实数据区域）
+  var fill = document.getElementById('realProgFill');
+  var text = document.getElementById('realProgText');
   if (fill) fill.style.width = '0%';
   if (text) text.textContent = '已完成 0/' + totalMeds + ' 次服药';
 
-  // 更新概览卡
-  var doneEl = document.querySelector('.s-card-num .done');
-  if (doneEl) doneEl.textContent = '0';
-  var totalEl = doneEl ? doneEl.nextElementSibling : null;
-  if (totalEl) totalEl.textContent = totalMeds;
+  // 更新概览卡（真实数据区域）
+  var realDone = document.getElementById('realDone');
+  var realTotal = document.getElementById('realTotal');
+  if (realDone) realDone.textContent = '0';
+  if (realTotal) realTotal.textContent = totalMeds;
 
-  // 更新库存概览
+  // 更新库存
   updateStockFromMeds(meds);
 }
 
-// 更新库存页面
+// 更新库存页面（写入真实数据区域）
 function updateStockFromMeds(meds) {
-  var boxList = document.querySelector('#page-box .box-list');
+  var boxList = document.getElementById('realBoxList');
   if (!boxList) return;
 
   var urgentCount = 0;
@@ -221,76 +221,55 @@ function updateStockFromMeds(meds) {
 
   boxList.innerHTML = html;
 
-  // 更新总览
-  var boItems = document.querySelectorAll('#page-box .bo-item');
-  if (boItems[0]) boItems[0].querySelector('.bo-num').textContent = meds.length;
-  if (boItems[1]) {
-    var numEl = boItems[1].querySelector('.bo-num');
-    numEl.textContent = urgentCount;
-    numEl.classList.toggle('warn-text', urgentCount > 0);
+  // 更新总览（真实数据区域）
+  var realMedCount = document.getElementById('realMedCount');
+  var realUrgentCount = document.getElementById('realUrgentCount');
+  var realWeeklyCount = document.getElementById('realWeeklyCount');
+  if (realMedCount) realMedCount.textContent = meds.length;
+  if (realUrgentCount) {
+    realUrgentCount.textContent = urgentCount;
+    realUrgentCount.classList.toggle('warn-text', urgentCount > 0);
   }
-  if (boItems[2]) boItems[2].querySelector('.bo-num').textContent = totalWeekly;
+  if (realWeeklyCount) realWeeklyCount.textContent = totalWeekly;
 }
 
-// 页面加载后：登录用户清除所有假数据，显示真实数据
+// 页面加载后：登录用户隐藏假数据，显示真实数据
 async function initMedData() {
   var user = await getCurrentUser();
   if (!user) return; // 未登录保留假数据作为演示
 
-  // === 清除所有页面的写死假数据 ===
+  // 隐藏假数据，显示真实数据容器
+  var mockHome = document.getElementById('mockDataHome');
+  var realHome = document.getElementById('realDataHome');
+  var mockBox = document.getElementById('mockDataBox');
+  var realBox = document.getElementById('realDataBox');
 
-  // 首页：时间轴、风险提醒、AI建议
-  var timeline = document.querySelector('.med-timeline');
-  if (timeline) timeline.innerHTML = '';
-  var riskAlerts = document.querySelector('#page-home .risk-alerts');
-  if (riskAlerts) riskAlerts.innerHTML = '';
-  var aiSuggest = document.querySelector('.ai-suggest-block');
-  if (aiSuggest) aiSuggest.style.display = 'none';
-  // 最近问诊卡
-  var visitCard = document.querySelector('#page-home .visit-card');
-  if (visitCard) visitCard.closest('.section-block').style.display = 'none';
+  if (mockHome) mockHome.style.display = 'none';
+  if (realHome) realHome.style.display = '';
+  if (mockBox) mockBox.style.display = 'none';
+  if (realBox) realBox.style.display = '';
 
-  // 库存页：清空药品列表和重复购药提醒
-  var boxList = document.querySelector('#page-box .box-list');
-  if (boxList) boxList.innerHTML = '';
-  var dupAlert = document.querySelector('#page-box .dup-alert');
-  if (dupAlert) dupAlert.style.display = 'none';
-
-  // 问诊页：续方进度、准备清单（这些依赖具体药品，清掉）
-  var renewSteps = document.querySelector('.renew-steps');
-  if (renewSteps) renewSteps.closest('.section-block').style.display = 'none';
-  var renewChecklist = document.querySelectorAll('#page-renew .checklist');
-  renewChecklist.forEach(function(el) { el.closest('.section-block').style.display = 'none'; });
-
-  // 重置概览卡数据
-  var doneEl = document.querySelector('.s-card-num .done');
-  if (doneEl) doneEl.textContent = '0';
-  var warnCard = document.querySelector('.s-card.warn .s-card-num');
-  if (warnCard) warnCard.textContent = '-';
-
-  // === 从数据库加载真实数据 ===
+  // 从数据库加载药品
   var meds = await getMedications();
 
   if (meds.length > 0) {
     await refreshTimeline();
-    // 生成风险提醒
     generateRiskAlerts(meds);
   } else {
     // 没有药品，显示空状态
+    if (realHome) realHome.style.display = 'none';
     var emptyState = document.getElementById('emptyState');
     if (emptyState) emptyState.style.display = '';
-    // 隐藏概览和进度条
-    var sections = document.querySelectorAll('#page-home .today-summary, #page-home .med-progress, #page-home .date-month-label, #page-home .date-picker');
-    sections.forEach(function(el) { el.style.display = 'none'; });
 
-    // 库存页也显示空状态
-    if (boxList) boxList.innerHTML = '<div class="empty-state" style="padding:40px 0"><div class="empty-icon">📦</div><div class="empty-title">还没有药品</div><div class="empty-desc">添加药品后这里会显示库存信息</div></div>';
+    // 库存页空状态
+    var realBoxList = document.getElementById('realBoxList');
+    if (realBoxList) realBoxList.innerHTML = '<div class="empty-state" style="padding:40px 0"><div class="empty-icon">📦</div><div class="empty-title">还没有药品</div><div class="empty-desc">添加药品后这里会显示库存信息</div></div>';
   }
 }
 
 // 根据药品库存生成风险提醒
 function generateRiskAlerts(meds) {
-  var riskAlerts = document.querySelector('#page-home .risk-alerts');
+  var riskAlerts = document.getElementById('realRiskAlerts');
   if (!riskAlerts) return;
 
   var html = '';
@@ -313,7 +292,7 @@ function generateRiskAlerts(meds) {
   riskAlerts.innerHTML = html;
 
   // 更新概览卡的"最近断药"
-  var warnCard = document.querySelector('.s-card.warn .s-card-num');
+  var warnCard = document.getElementById('realMinDays');
   if (warnCard) {
     var minDays = 999;
     meds.forEach(function(med) {
@@ -321,6 +300,6 @@ function generateRiskAlerts(meds) {
       var days = med.stock_count > 0 ? Math.floor(med.stock_count / daily) : 0;
       if (days < minDays) minDays = days;
     });
-    warnCard.textContent = minDays < 999 ? minDays + '天' : '-';
+    warnCard.textContent = minDays < 999 ? minDays + '天' : '-天';
   }
 }

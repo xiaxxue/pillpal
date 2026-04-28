@@ -145,6 +145,9 @@
           </button>
         </div>
 
+        <!-- 以下为假数据区域，登录后会被隐藏 -->
+        <div id="mockDataHome">
+
         <!-- 今日概览 -->
         <section class="today-summary">
           <div class="summary-cards">
@@ -341,6 +344,42 @@
           </div>
         </section>
 
+        </div><!-- /mockDataHome -->
+
+        <!-- 真实数据区域（登录后从数据库加载） -->
+        <div id="realDataHome" style="display:none">
+          <section class="today-summary">
+            <div class="summary-cards">
+              <div class="s-card">
+                <div class="s-card-num"><span class="done" id="realDone">0</span>/<span id="realTotal">0</span></div>
+                <div class="s-card-label">今日已服</div>
+              </div>
+              <div class="s-card accent">
+                <div class="s-card-num" id="realNextTime">--:--</div>
+                <div class="s-card-label">下次提醒</div>
+              </div>
+              <div class="s-card warn">
+                <div class="s-card-num" id="realMinDays">-</div>
+                <div class="s-card-label">药快没了</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="risk-alerts" id="realRiskAlerts"></section>
+
+          <section class="section-block">
+            <div class="section-header">
+              <h3>今日用药</h3>
+              <span class="section-link" onclick="openAddMedModal()">+ 添加药品</span>
+            </div>
+            <div class="med-progress">
+              <div class="prog-bar"><div class="prog-fill" id="realProgFill" style="width:0%"></div></div>
+              <div class="prog-text" id="realProgText">已完成 0/0 次服药</div>
+            </div>
+            <div class="med-timeline" id="realTimeline"></div>
+          </section>
+        </div>
+
       </main>
     </div>
 
@@ -350,6 +389,7 @@
         <h2>家里剩余药量</h2>
       </header>
       <main class="content">
+        <div id="mockDataBox">
         <div class="box-overview">
           <div class="bo-item">
             <div class="bo-num">4</div>
@@ -494,6 +534,21 @@
             </div>
           </div>
         </div>
+        </div><!-- /mockDataBox -->
+
+        <!-- 真实库存数据区域 -->
+        <div id="realDataBox" style="display:none">
+          <div class="box-overview">
+            <div class="bo-item"><div class="bo-num" id="realMedCount">0</div><div class="bo-label">正在吃的药</div></div>
+            <div class="bo-item"><div class="bo-num" id="realUrgentCount">0</div><div class="bo-label">快吃完了</div></div>
+            <div class="bo-item"><div class="bo-num" id="realWeeklyCount">0</div><div class="bo-label">一周用药量/片</div></div>
+          </div>
+          <div class="box-list" id="realBoxList"></div>
+          <div style="padding:16px 0;text-align:center">
+            <button class="btn-primary-lg" style="width:100%" onclick="openAddMedModal()">+ 添加新药品</button>
+          </div>
+        </div>
+
       </main>
     </div>
 
