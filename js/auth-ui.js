@@ -152,6 +152,11 @@ async function handleSignup() {
 // 跳过登录（体验模式）
 function skipAuth() {
   hideAuthModal();
+  // 显示假数据供体验
+  var mockHome = document.getElementById('mockDataHome');
+  var mockBox = document.getElementById('mockDataBox');
+  if (mockHome) mockHome.style.display = '';
+  if (mockBox) mockBox.style.display = '';
   showToast('体验模式：数据仅保存在本地');
 }
 
