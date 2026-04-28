@@ -304,7 +304,7 @@ function updateStockFromMeds(meds) {
     html += '<div class="box-info"><span class="box-info-label">可服天数</span><span' + (isUrgent ? ' class="warn-text"' : '') + '>' + days + '天</span></div>';
     html += '<div class="box-info"><span class="box-info-label">预计用完</span><span' + (isUrgent ? ' class="warn-text"' : '') + '>' + dateStr + '</span></div>';
     html += '</div>';
-    html += '<button class="box-edit-btn full-w" onclick="editStock(this, \'' + escapeHtml(med.name) + '\', ' + med.stock_count + ')">修正数量</button>';
+    html += '<button class="box-edit-btn full-w" onclick="editStock(this, \'' + escapeHtml(med.name) + '\', ' + med.stock_count + ', ' + daily + ')">修正信息</button>';
     html += '</div>';
   });
 

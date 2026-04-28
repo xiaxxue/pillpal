@@ -1059,11 +1059,19 @@ function undoMed(btn) {
 
 // ====== 库存修正 ======
 let stockTarget = null;
-function editStock(btn, drugName, currentQty) {
+function editStock(btn, drugName, currentQty, dailyUsage) {
   stockTarget = btn.closest('.box-card');
   document.getElementById('stockDrugName').textContent = drugName;
   document.getElementById('stockInput').value = currentQty;
+  document.getElementById('dailyUsageInput').value = dailyUsage || 1;
   document.getElementById('stockModal').classList.add('show');
+}
+
+function stepDailyUsage(delta) {
+  var input = document.getElementById('dailyUsageInput');
+  var val = parseInt(input.value) || 1;
+  val = Math.max(1, val + delta);
+  input.value = val;
 }
 
 function stepStock(delta) {
@@ -1075,12 +1083,13 @@ function stepStock(delta) {
 
 async function confirmStock() {
   const qty = parseInt(document.getElementById('stockInput').value) || 0;
+  const dailyUsage = parseInt(document.getElementById('dailyUsageInput').value) || 1;
   const drugName = document.getElementById('stockDrugName').textContent;
 
   // 更新数据库
   var user = await getCurrentUser();
   if (user && sb) {
-    await sb.from('medications').update({ stock_count: qty }).eq('user_id', user.id).eq('name', drugName);
+    await sb.from('medications').update({ stock_count: qty, daily_usage: dailyUsage }).eq('user_id', user.id).eq('name', drugName);
     // 刷新库存页
     var meds = await getMedications();
     updateStockFromMeds(meds);
