@@ -264,6 +264,7 @@ async function refreshTimeline() {
       html += '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>';
       html += '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>';
       html += '</div>';
+      html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
       html += '</div>';
     });
 

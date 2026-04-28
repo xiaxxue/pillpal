@@ -3130,6 +3130,17 @@ input { font-family: inherit; font-size: inherit; }
 .empty-state {
   text-align: center; padding: 60px 24px 40px;
 }
+/* 时间轴卡片删除按钮 */
+.med-card { position: relative; }
+.mc-delete {
+  position: absolute; top: 8px; right: 8px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--bg); color: var(--text-third);
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; transition: all .15s;
+}
+.mc-delete:active { background: var(--danger-light); color: var(--danger); }
+
 .empty-icon { font-size: 64px; margin-bottom: 16px; }
 .empty-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
 .empty-desc { font-size: 14px; color: var(--text-sec); line-height: 1.6; }
