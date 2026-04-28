@@ -48,6 +48,48 @@ function updateTopBarWithData(meds) {
   }
 }
 
+// ====== 打卡扣减库存 ======
+async function deductStock(card) {
+  var medId = card.getAttribute('data-med-id');
+  var medName = card.querySelector('.mc-name');
+  if (!medName) return;
+  var name = medName.textContent;
+
+  // 从数据库获取当前库存
+  var user = await getCurrentUser();
+  if (user && sb) {
+    var result = await sb.from('medications').select('id, stock_count').eq('user_id', user.id).eq('name', name).single();
+    if (result.data && result.data.stock_count > 0) {
+      var newCount = result.data.stock_count - 1;
+      await sb.from('medications').update({ stock_count: newCount }).eq('id', result.data.id);
+      // 刷新库存页
+      var meds = await getMedications();
+      updateStockFromMeds(meds);
+      updateTopBarWithData(meds);
+      generateRiskAlerts(meds);
+    }
+  }
+}
+
+async function restoreStock(card) {
+  var medName = card.querySelector('.mc-name');
+  if (!medName) return;
+  var name = medName.textContent;
+
+  var user = await getCurrentUser();
+  if (user && sb) {
+    var result = await sb.from('medications').select('id, stock_count').eq('user_id', user.id).eq('name', name).single();
+    if (result.data) {
+      var newCount = result.data.stock_count + 1;
+      await sb.from('medications').update({ stock_count: newCount }).eq('id', result.data.id);
+      var meds = await getMedications();
+      updateStockFromMeds(meds);
+      updateTopBarWithData(meds);
+      generateRiskAlerts(meds);
+    }
+  }
+}
+
 // 打开添加药品弹窗
 function openAddMedModal() {
   document.getElementById('addMedName').value = '';

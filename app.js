@@ -388,6 +388,8 @@ function takeMedCard(btn) {
   medRecords[getMedKey(card)] = 'done_' + timeStr;
   saveData('med_' + todayStr, medRecords);
   updateAllProgress();
+  // 打卡后扣减库存
+  deductStock(card);
   // 震动反馈 + 大对勾动画
   if (navigator.vibrate) navigator.vibrate(100);
   showDoneCheck();
@@ -1049,6 +1051,8 @@ function undoMed(btn) {
   // 删除记录
   delete medRecords[getMedKey(card)];
   saveData('med_' + todayStr, medRecords);
+  // 撤回时恢复库存
+  restoreStock(card);
   updateAllProgress();
   showToast('已撤回，请重新确认服药');
 }
@@ -1069,16 +1073,29 @@ function stepStock(delta) {
   input.value = val;
 }
 
-function confirmStock() {
+async function confirmStock() {
   const qty = parseInt(document.getElementById('stockInput').value) || 0;
   const drugName = document.getElementById('stockDrugName').textContent;
-  if (stockTarget) {
-    const meterText = stockTarget.querySelector('.meter-text');
-    if (meterText) meterText.textContent = '剩余 ' + qty + ' 片';
+
+  // 更新数据库
+  var user = await getCurrentUser();
+  if (user && sb) {
+    await sb.from('medications').update({ stock_count: qty }).eq('user_id', user.id).eq('name', drugName);
+    // 刷新库存页
+    var meds = await getMedications();
+    updateStockFromMeds(meds);
+    updateTopBarWithData(meds);
+    generateRiskAlerts(meds);
+  } else {
+    // 离线模式
+    stockData[drugName] = qty;
+    saveData('stock', stockData);
+    if (stockTarget) {
+      var meterText = stockTarget.querySelector('.meter-text');
+      if (meterText) meterText.textContent = '剩余 ' + qty + ' 片';
+    }
   }
-  // 保存库存
-  stockData[drugName] = qty;
-  saveData('stock', stockData);
+
   document.getElementById('stockModal').classList.remove('show');
   showToast(drugName + ' 库存已修正为 ' + qty + ' 片');
 }
