@@ -235,8 +235,15 @@ function updateStockFromMeds(meds) {
 
 // 页面加载后：登录用户隐藏假数据，显示真实数据
 async function initMedData() {
-  var user = await getCurrentUser();
+  var user = null;
+  try {
+    user = await getCurrentUser();
+  } catch(e) {
+    console.log('获取用户失败:', e);
+  }
   if (!user) return; // 未登录保留假数据作为演示
+
+  console.log('initMedData: 登录用户，清除假数据');
 
   // 隐藏假数据，显示真实数据容器
   var mockHome = document.getElementById('mockDataHome');
@@ -244,10 +251,10 @@ async function initMedData() {
   var mockBox = document.getElementById('mockDataBox');
   var realBox = document.getElementById('realDataBox');
 
-  if (mockHome) mockHome.style.display = 'none';
-  if (realHome) realHome.style.display = '';
-  if (mockBox) mockBox.style.display = 'none';
-  if (realBox) realBox.style.display = '';
+  if (mockHome) { mockHome.style.display = 'none'; console.log('mockDataHome 已隐藏'); }
+  if (realHome) { realHome.style.display = ''; console.log('realDataHome 已显示'); }
+  if (mockBox) { mockBox.style.display = 'none'; console.log('mockDataBox 已隐藏'); }
+  if (realBox) { realBox.style.display = ''; console.log('realDataBox 已显示'); }
 
   // 从数据库加载药品
   var meds = await getMedications();
