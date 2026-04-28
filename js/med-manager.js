@@ -1,5 +1,53 @@
 // ====== 药品管理 + 动态时间轴 ======
 
+// 根据真实数据更新顶栏副标题和AI建议
+function updateTopBarWithData(meds) {
+  var homeSub = document.getElementById('homeSub');
+  var aiText = document.getElementById('aiSuggestText');
+  var homeScore = document.getElementById('homeScore');
+
+  if (meds.length === 0) {
+    // 没有药品
+    if (homeSub) homeSub.textContent = '添加药品开始管理用药';
+    if (aiText) aiText.innerHTML = '<p>&#128075; 还没有添加药品，点击下方按钮开始吧</p>';
+    if (homeScore) homeScore.textContent = '-';
+    return;
+  }
+
+  // 有药品：显示药品数和库存状态
+  var urgentMeds = [];
+  var totalDaily = 0;
+  meds.forEach(function(med) {
+    var daily = med.daily_usage || 1;
+    totalDaily += daily;
+    var days = med.stock_count > 0 ? Math.floor(med.stock_count / daily) : 0;
+    if (days <= 7) urgentMeds.push(med.name + '（剩' + days + '天）');
+  });
+
+  // 副标题：显示正在服用的药品数
+  if (homeSub) {
+    homeSub.textContent = '正在服用 ' + meds.length + ' 种药 · 每天 ' + totalDaily + ' 次';
+  }
+
+  // AI建议：根据实际情况动态生成
+  if (aiText) {
+    var tips = [];
+
+    // 库存提醒
+    if (urgentMeds.length > 0) {
+      tips.push('&#9888; ' + urgentMeds.join('、') + ' 快吃完了，记得续方');
+    }
+
+    // 通用建议
+    if (tips.length === 0) {
+      tips.push('&#127793; 所有药品库存充足，继续保持按时服药');
+    }
+    tips.push('&#128138; 今天有 ' + totalDaily + ' 次服药，记得按时吃哦');
+
+    aiText.innerHTML = tips.map(function(t) { return '<p>' + t + '</p>'; }).join('');
+  }
+}
+
 // 打开添加药品弹窗
 function openAddMedModal() {
   document.getElementById('addMedName').value = '';
@@ -258,6 +306,9 @@ async function initMedData() {
 
   // 从数据库加载药品
   var meds = await getMedications();
+
+  // 更新顶栏副标题和AI建议
+  updateTopBarWithData(meds);
 
   if (meds.length > 0) {
     await refreshTimeline();

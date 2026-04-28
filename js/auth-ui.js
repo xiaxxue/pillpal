@@ -166,12 +166,10 @@ function updateUserDisplay(user) {
   if (homeAvatar) homeAvatar.textContent = initial;
   var homeGreeting = document.getElementById('homeGreeting');
   if (homeGreeting) homeGreeting.textContent = timeStr + '，' + name;
-  var homeSub = document.getElementById('homeSub');
-  if (homeSub) homeSub.textContent = '欢迎使用 PillPal';
   var miniText = document.getElementById('miniText');
   if (miniText) miniText.textContent = name + ' · PillPal';
 
-  // 显示 AI 建议区
+  // 副标题和 AI 建议在药品数据加载后更新（见 updateTopBarWithData）
   var topBarAi = document.getElementById('topBarAi');
   if (topBarAi) topBarAi.style.display = '';
 
