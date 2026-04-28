@@ -136,19 +136,18 @@ async function handleAddMed() {
 async function refreshTimeline() {
   var meds = await getMedications();
 
-  // 如果没有药品，显示空状态
   var emptyState = document.getElementById('emptyState');
-  var homeContent = document.querySelectorAll('#page-home .section-block, #page-home .today-summary, #page-home .risk-alerts, #page-home .med-progress, #page-home .date-month-label, #page-home .date-picker');
+  var realHome = document.getElementById('realDataHome');
 
   if (meds.length === 0) {
     if (emptyState) emptyState.style.display = '';
-    homeContent.forEach(function(el) { el.style.display = 'none'; });
+    if (realHome) realHome.style.display = 'none';
     return;
   }
 
-  // 有药品，隐藏空状态
+  // 有药品，显示真实数据区域，隐藏空状态
   if (emptyState) emptyState.style.display = 'none';
-  homeContent.forEach(function(el) { el.style.display = ''; });
+  if (realHome) realHome.style.display = '';
 
   // 按时间分组
   var timeSlots = {
