@@ -28,14 +28,13 @@ async function checkAuthState() {
     if (typeof initPush === 'function') initPush();
     if (typeof initMedData === 'function') await initMedData();
     if (typeof checkOnboarding === 'function') await checkOnboarding();
-    // 检查上次选的角色，直接进入
+    // 有上次角色记录就直接进入，否则显示角色选择页
     var lastRole = localStorage.getItem('yygh_last_role');
     if (lastRole) {
-      selectRole(lastRole);
+      enterRole(lastRole);
     }
-    // 没选过角色则显示角色选择页（默认已显示）
   }
-  // 未登录，显示登录弹窗（默认已显示）
+  // 未登录 + 没选角色 → 显示角色选择页（默认已显示）
 
   // 监听状态变化
   onAuthChange(function(event, session) {
@@ -114,6 +113,9 @@ async function handleLogin() {
       if (typeof initMedData === 'function') await initMedData();
       updateUserDisplay(result.data.user);
       if (typeof checkOnboarding === 'function') await checkOnboarding();
+      // 进入选择的角色
+      var role = pendingRole || localStorage.getItem('yygh_last_role') || 'patient';
+      enterRole(role);
       showToast('数据同步完成');
     }
   } catch(e) {

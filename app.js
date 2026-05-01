@@ -2029,31 +2029,43 @@ function setFontSize(btn, className) {
 // ====== 启动页角色选择 ======
 
 function selectRole(role) {
-  // 记住角色选择，下次登录自动进入
+  // 记住角色选择
   localStorage.setItem('yygh_last_role', role);
-  // 隐藏启动页
+  pendingRole = role;
+
+  // 检查是否已登录
+  getCurrentUser().then(function(user) {
+    if (user) {
+      // 已登录，直接进入
+      enterRole(role);
+    } else {
+      // 未登录，弹登录框
+      showAuthModal();
+    }
+  });
+}
+
+// 实际进入角色模式
+function enterRole(role) {
   document.getElementById('page-launch').classList.remove('active');
 
   if (role === 'patient') {
-    // 显示患者导航和首页
     inFamilyMode = false;
     document.getElementById('tab-bar-main').style.display = '';
     document.getElementById('familyTabBar').style.display = 'none';
     switchTab('tab-home');
   } else {
-    // 显示家属导航和监护首页
     inFamilyMode = true;
     document.getElementById('tab-bar-main').style.display = 'none';
     document.getElementById('familyTabBar').style.display = '';
-    // 重置家属tab
     document.querySelectorAll('#familyTabBar .tab').forEach(t => t.classList.remove('active'));
     document.getElementById('fm-tab-home').classList.add('active');
     document.getElementById('page-fm-home').classList.add('active');
-    if (typeof buildFamilyDatePicker === 'function') buildFamilyDatePicker();
-    // 加载真实患者数据
     if (typeof initFamilyMode === 'function') initFamilyMode();
   }
 }
+
+var pendingRole = null;
 
 function backToRoleSelect() {
   inFamilyMode = false;
