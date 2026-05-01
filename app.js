@@ -324,43 +324,44 @@ function initTimeline(offset) {
 }
 
 function updateAllProgress() {
-  // 统计真实数据区域的打卡数
-  var realTimeline = document.getElementById('realTimeline');
-  var doneCount, totalCount;
+  // 直接从 medRecords 统计，不依赖 DOM class
+  var doneCount = 0;
+  var totalCards = document.querySelectorAll('#realTimeline .med-card');
+  var totalCount = totalCards.length;
 
-  if (realTimeline && realTimeline.children.length > 0) {
-    doneCount = realTimeline.querySelectorAll('.med-card.done').length;
-    totalCount = realTimeline.querySelectorAll('.med-card').length;
+  // 如果真实时间轴没有卡片，试试假数据区域
+  if (totalCount === 0) {
+    totalCards = document.querySelectorAll('#mockDataHome .med-card');
+    totalCount = totalCards.length;
+  }
 
-    // 更新真实数据区域
-    var realFill = document.getElementById('realProgFill');
-    var realText = document.getElementById('realProgText');
-    var pct = totalCount > 0 ? Math.round(doneCount / totalCount * 100) : 0;
-    if (realFill) realFill.style.width = pct + '%';
-    if (realText) realText.textContent = '已完成 ' + doneCount + '/' + totalCount + ' 次服药';
-
-    var realDone = document.getElementById('realDone');
-    var realTotal = document.getElementById('realTotal');
-    if (realDone) realDone.textContent = doneCount;
-    if (realTotal) realTotal.textContent = totalCount;
-
-    // 更新下次提醒
-    var realNextTime = document.getElementById('realNextTime');
-    if (realNextTime) {
-      if (doneCount >= totalCount) {
-        realNextTime.textContent = '全部完成';
-      }
+  // 从 medRecords 里数已完成的
+  Object.keys(medRecords).forEach(function(key) {
+    if (medRecords[key] && (medRecords[key].startsWith('done_') || medRecords[key].startsWith('skip_'))) {
+      doneCount++;
     }
-  } else {
-    // 假数据区域兜底
-    doneCount = document.querySelectorAll('#page-home .med-card.done').length;
-    totalCount = document.querySelectorAll('#page-home .med-card').length;
-    var fill = document.querySelector('.prog-fill');
-    var text = document.querySelector('.prog-text');
-    if (fill) fill.style.width = Math.round(doneCount / totalCount * 100) + '%';
-    if (text) text.textContent = '已完成 ' + doneCount + '/' + totalCount + ' 次服药';
-    var summaryEl = document.querySelector('.s-card-num .done');
-    if (summaryEl) summaryEl.textContent = doneCount;
+  });
+
+  // 确保 doneCount 不超过 totalCount
+  if (doneCount > totalCount) doneCount = totalCount;
+
+  var pct = totalCount > 0 ? Math.round(doneCount / totalCount * 100) : 0;
+
+  // 更新真实数据区域
+  var realFill = document.getElementById('realProgFill');
+  var realText = document.getElementById('realProgText');
+  if (realFill) realFill.style.width = pct + '%';
+  if (realText) realText.textContent = '已完成 ' + doneCount + '/' + totalCount + ' 次服药';
+
+  var realDone = document.getElementById('realDone');
+  var realTotal = document.getElementById('realTotal');
+  if (realDone) realDone.textContent = doneCount;
+  if (realTotal) realTotal.textContent = totalCount;
+
+  // 下次提醒
+  var realNextTime = document.getElementById('realNextTime');
+  if (realNextTime) {
+    realNextTime.textContent = (doneCount >= totalCount && totalCount > 0) ? '全部完成' : realNextTime.textContent;
   }
 }
 
