@@ -829,7 +829,7 @@ function showThinkingThenReply(steps, reply) {
   var area = document.getElementById('chatMessages');
   var thinkDiv = document.createElement('div');
   thinkDiv.className = 'chat-msg ai';
-  thinkDiv.innerHTML = '<div class="chat-msg-avatar">&#129432;</div>' +
+  thinkDiv.innerHTML = '<div class="chat-msg-avatar">&#128138;</div>' +
     '<div class="ai-thinking" id="thinkBubble"></div>';
   area.appendChild(thinkDiv);
   scrollChat();
@@ -1076,7 +1076,7 @@ function addAgentReply(reply) {
   var area = document.getElementById('chatMessages');
   var div = document.createElement('div');
   div.className = 'chat-msg ai';
-  var html = '<div class="chat-msg-avatar">&#129432;</div><div class="chat-msg-bubble">';
+  var html = '<div class="chat-msg-avatar">&#128138;</div><div class="chat-msg-bubble">';
   html += reply.text;
   if (reply.actionCard) {
     html += reply.actionCard;
@@ -2308,7 +2308,7 @@ function fmShowThinking(steps, callback) {
   var area = document.getElementById('fmChatMessages');
   var div = document.createElement('div');
   div.className = 'chat-msg ai';
-  div.innerHTML = '<div class="chat-msg-avatar">&#129432;</div><div class="ai-thinking" id="fmThinkBubble"></div>';
+  div.innerHTML = '<div class="chat-msg-avatar">&#128138;</div><div class="ai-thinking" id="fmThinkBubble"></div>';
   area.appendChild(div);
   fmScrollBottom();
   var bubble = document.getElementById('fmThinkBubble');
@@ -2336,7 +2336,7 @@ function fmAddAgentMsg(data) {
   var area = document.getElementById('fmChatMessages');
   var div = document.createElement('div');
   div.className = 'chat-msg ai';
-  var html = '<div class="chat-msg-avatar">&#129432;</div><div class="chat-msg-bubble">';
+  var html = '<div class="chat-msg-avatar">&#128138;</div><div class="chat-msg-bubble">';
   html += data.text;
   if (data.actionCard) html += data.actionCard;
   if (data.warn) html += '<div class="ai-warn">' + data.warn + '</div>';
