@@ -11,6 +11,34 @@ function loadData(key, fallback) {
   } catch(e) { return fallback; }
 }
 
+// 从数据库删除一条打卡记录
+function deleteCloudRecord(medKey) {
+  if (!sb) return;
+  sb.auth.getUser().then(function(result) {
+    if (!result.data || !result.data.user) return;
+    var userId = result.data.user.id;
+    var timeSlot = medKey.split('_').pop();
+    var medName = medKey.replace('_' + timeSlot, '');
+
+    // 查出药品ID
+    sb.from('medications').select('id').eq('user_id', userId).eq('name', medName).then(function(medsResult) {
+      if (!medsResult.data) return;
+      medsResult.data.forEach(function(med) {
+        sb.from('daily_records')
+          .delete()
+          .eq('user_id', userId)
+          .eq('medication_id', med.id)
+          .eq('record_date', todayStr)
+          .eq('time_slot', timeSlot)
+          .then(function(res) {
+            if (res.error) console.error('删除打卡记录失败:', res.error.message);
+            else console.log('已从数据库删除打卡记录:', medKey);
+          });
+      });
+    });
+  });
+}
+
 // 时间标签转小时数：如 "晨起 7:00" → 7, "午餐后 14:30" → 14.5
 function parseTimeLabel(label) {
   var match = label.match(/(\d+):(\d+)/);
@@ -1105,9 +1133,12 @@ function undoMed(btn) {
       '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>' +
       '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>' +
     '</div>';
-  // 删除记录
-  delete medRecords[getMedKey(card)];
+  // 删除本地记录
+  var undoKey = getMedKey(card);
+  delete medRecords[undoKey];
   saveData('med_' + todayStr, medRecords);
+  // 从数据库删除这条打卡记录
+  deleteCloudRecord(undoKey);
   // 撤回时恢复库存
   restoreStock(card);
   updateAllProgress();
