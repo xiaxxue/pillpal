@@ -6,7 +6,12 @@ var boundPatientName = '';
 // 入口：进入家属模式时调用
 async function initFamilyMode() {
   var user = await getCurrentUser();
-  if (!user) return;
+  if (!user) {
+    // 未登录，先弹登录框
+    showAuthModal();
+    showToast('请先登录或注册一个家属账号');
+    return;
+  }
 
   // 查询绑定的患者
   var patients = await getMyPatients();
