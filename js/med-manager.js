@@ -434,7 +434,7 @@ function buildRealDatePicker(centerDate) {
   if (!picker) return;
   if (centerDate) datePickerCenter = new Date(centerDate);
   var today = new Date();
-  today.setHours(0,0,0,0);
+  today.setHours(12,0,0,0); // 统一用中午12点比较
   var weekNames = ['周日','周一','周二','周三','周四','周五','周六'];
   var html = '';
   for (var i = -3; i <= 3; i++) {
