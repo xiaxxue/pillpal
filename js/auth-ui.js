@@ -28,6 +28,12 @@ async function checkAuthState() {
     if (typeof initPush === 'function') initPush();
     if (typeof initMedData === 'function') await initMedData();
     if (typeof checkOnboarding === 'function') await checkOnboarding();
+    // 检查上次选的角色，直接进入
+    var lastRole = localStorage.getItem('yygh_last_role');
+    if (lastRole) {
+      selectRole(lastRole);
+    }
+    // 没选过角色则显示角色选择页（默认已显示）
   }
   // 未登录，显示登录弹窗（默认已显示）
 

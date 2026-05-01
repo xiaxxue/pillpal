@@ -2029,6 +2029,8 @@ function setFontSize(btn, className) {
 // ====== 启动页角色选择 ======
 
 function selectRole(role) {
+  // 记住角色选择，下次登录自动进入
+  localStorage.setItem('yygh_last_role', role);
   // 隐藏启动页
   document.getElementById('page-launch').classList.remove('active');
 
