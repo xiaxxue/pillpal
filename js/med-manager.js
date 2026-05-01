@@ -467,6 +467,14 @@ function buildRealDatePicker(centerDate) {
   }
   picker.innerHTML = html;
 
+  // 滚动到选中日期居中
+  setTimeout(function() {
+    var active = picker.querySelector('.real-date-item.active');
+    if (active) {
+      picker.scrollLeft = active.offsetLeft - picker.offsetWidth / 2 + active.offsetWidth / 2;
+    }
+  }, 50);
+
   // 设置日期跳转输入框
   var jumpInput = document.getElementById('dateJumpInput');
   if (jumpInput) jumpInput.value = currentViewDate;
