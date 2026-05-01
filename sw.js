@@ -1,5 +1,5 @@
 // ====== Service Worker ======
-var CACHE_NAME = 'pillpal-v8';
+var CACHE_NAME = 'pillpal-v9';
 var ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ var ASSETS = [
   './js/push.js',
   './js/med-manager.js',
   './js/onboard.js',
+  './js/family-mode.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'

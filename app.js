@@ -2048,6 +2048,8 @@ function selectRole(role) {
     document.getElementById('fm-tab-home').classList.add('active');
     document.getElementById('page-fm-home').classList.add('active');
     if (typeof buildFamilyDatePicker === 'function') buildFamilyDatePicker();
+    // 加载真实患者数据
+    if (typeof initFamilyMode === 'function') initFamilyMode();
   }
 }
 
