@@ -1,7 +1,5 @@
 // ====== Service Worker ======
-// 负责离线缓存和推送通知
-
-var CACHE_NAME = 'pillpal-v6';
+var CACHE_NAME = 'pillpal-v7';
 var ASSETS = [
   './',
   './index.html',
@@ -12,6 +10,7 @@ var ASSETS = [
   './js/auth-ui.js',
   './js/push.js',
   './js/med-manager.js',
+  './js/onboard.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'
@@ -27,7 +26,7 @@ self.addEventListener('install', function(event) {
   self.skipWaiting();
 });
 
-// 激活：清除旧缓存
+// 激活：立即接管，清除所有旧缓存
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(keys) {
@@ -40,31 +39,31 @@ self.addEventListener('activate', function(event) {
   self.clients.claim();
 });
 
-// 请求拦截：静态资源走缓存，API 走网络
+// 请求拦截：网络优先，失败才用缓存
 self.addEventListener('fetch', function(event) {
   var url = event.request.url;
 
-  // Supabase API 和 CDN 请求走网络
+  // Supabase API 和 CDN 直接走网络
   if (url.includes('supabase') || url.includes('cdn.jsdelivr')) {
     return;
   }
 
-  // 静态资源：缓存优先，网络兜底
+  // 网络优先策略：先尝试网络，失败才用缓存
   event.respondWith(
-    caches.match(event.request).then(function(cached) {
-      return cached || fetch(event.request).then(function(response) {
-        // 缓存新资源
-        if (response.status === 200) {
-          var clone = response.clone();
-          caches.open(CACHE_NAME).then(function(cache) {
-            cache.put(event.request, clone);
-          });
-        }
-        return response;
-      });
+    fetch(event.request).then(function(response) {
+      // 网络成功，更新缓存
+      if (response.status === 200) {
+        var clone = response.clone();
+        caches.open(CACHE_NAME).then(function(cache) {
+          cache.put(event.request, clone);
+        });
+      }
+      return response;
     }).catch(function() {
-      // 离线且无缓存，返回首页
-      return caches.match('./index.html');
+      // 网络失败（离线），用缓存
+      return caches.match(event.request).then(function(cached) {
+        return cached || caches.match('./index.html');
+      });
     })
   );
 });
@@ -90,7 +89,5 @@ self.addEventListener('push', function(event) {
 // 点击通知
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  event.waitUntil(
-    clients.openWindow('./')
-  );
+  event.waitUntil(clients.openWindow('./'));
 });
