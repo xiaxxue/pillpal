@@ -174,7 +174,9 @@ async function loadFromCloud(dateStr) {
   return records;
 }
 
-var todayStr = new Date().toISOString().slice(0, 10);
+// 用本地时间而不是 UTC，避免时区问题
+var _now = new Date();
+var todayStr = _now.getFullYear() + '-' + String(_now.getMonth() + 1).padStart(2, '0') + '-' + String(_now.getDate()).padStart(2, '0');
 var medRecords = loadData('med_' + todayStr, {});
 var stockData = loadData('stock', {});
 var familyData = loadData('family', []);

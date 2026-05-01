@@ -439,7 +439,7 @@ function buildRealDatePicker(centerDate) {
   for (var i = -3; i <= 3; i++) {
     var d = new Date(datePickerCenter);
     d.setDate(datePickerCenter.getDate() + i);
-    var dateStr = d.toISOString().slice(0, 10);
+    var dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     var day = d.getDate();
 
     // 跨月显示月份
