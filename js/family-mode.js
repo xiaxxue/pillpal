@@ -66,6 +66,29 @@ function showFmEmptyState() {
   var topBar = document.querySelector('#page-fm-home .fm-top-bar');
   if (topBar) topBar.style.display = 'none';
 
+  // 清空设置页假数据
+  var settingsContent = document.querySelector('#page-fm-settings .content');
+  if (settingsContent) {
+    settingsContent.innerHTML =
+      '<div class="empty-state" style="padding:60px 24px">' +
+        '<div class="empty-icon">&#128101;</div>' +
+        '<div class="empty-title">还没有绑定家人</div>' +
+        '<div class="empty-desc">请先在监护首页绑定家人</div>' +
+      '</div>' +
+      '<button class="fm-exit-btn" onclick="backToRoleSelect()">切换角色</button>';
+  }
+
+  // 清空药量页假数据
+  var stockContent = document.querySelector('#page-fm-stock .content');
+  if (stockContent) {
+    stockContent.innerHTML =
+      '<div class="empty-state" style="padding:60px 24px">' +
+        '<div class="empty-icon">📦</div>' +
+        '<div class="empty-title">还没有绑定家人</div>' +
+        '<div class="empty-desc">绑定后可查看家人的药品库存</div>' +
+      '</div>';
+  }
+
   // 在监护首页显示引导
   var homeContent = document.querySelector('#page-fm-home .content');
   if (homeContent) {
@@ -295,23 +318,37 @@ async function loadPatientStock(patientId) {
   if (header) header.textContent = boundPatientName + '的药品库存';
 }
 
-// ====== 加载设置页已绑定患者列表 ======
+// ====== 加载设置页 ======
 function loadBoundPatients(patients) {
-  var listArea = document.querySelector('#page-fm-settings .family-list');
-  if (!listArea) return;
+  var settingsContent = document.querySelector('#page-fm-settings .content');
+  if (!settingsContent) return;
 
-  var html = '';
-  patients.forEach(function(link) {
-    var name = boundPatientName;
-    var relation = link.relation || '家人';
-    html += '<div class="family-card" style="border:2px solid var(--primary)">' +
-      '<div class="family-avatar">' + name.charAt(0) + '</div>' +
-      '<div class="family-info">' +
-        '<div class="family-name">' + name + ' <span class="family-role">' + relation + '</span></div>' +
-        '<div class="family-phone">当前管理</div>' +
+  var name = boundPatientName;
+  var relation = (patients[0] && patients[0].relation) || '家人';
+
+  settingsContent.innerHTML =
+    // 管理对象卡片
+    '<div class="fm-person-card" style="margin-top:16px">' +
+      '<div class="fm-person-avatar">' + name.charAt(0) + '</div>' +
+      '<div class="fm-person-info">' +
+        '<div class="fm-person-name">' + relation + ' · ' + name + '</div>' +
+        '<div class="fm-person-bind">正在管理中</div>' +
       '</div>' +
-      '<div class="family-status bound">管理中</div>' +
-    '</div>';
-  });
-  listArea.innerHTML = html;
+    '</div>' +
+    // 管理对象列表
+    '<div class="panel-section">' +
+      '<div class="panel-section-title">&#128106; 管理对象</div>' +
+      '<div class="family-list">' +
+        '<div class="family-card" style="border:2px solid var(--primary)">' +
+          '<div class="family-avatar">' + name.charAt(0) + '</div>' +
+          '<div class="family-info">' +
+            '<div class="family-name">' + name + ' <span class="family-role">' + relation + '</span></div>' +
+            '<div class="family-phone">当前管理</div>' +
+          '</div>' +
+          '<div class="family-status bound">管理中</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    // 切换角色按钮
+    '<button class="fm-exit-btn" onclick="backToRoleSelect()">切换角色</button>';
 }
