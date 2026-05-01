@@ -83,33 +83,33 @@ function syncToCloud(key, value) {
   });
 }
 
-// 页面加载时从云端拉取数据（覆盖本地）
-async function loadFromCloud() {
-  if (!sb) return;
+// 从云端拉取指定日期的打卡记录（默认今天）
+async function loadFromCloud(dateStr) {
+  if (!sb) return {};
   var result = await sb.auth.getUser();
-  if (!result.data || !result.data.user) return;
+  if (!result.data || !result.data.user) return {};
   var userId = result.data.user.id;
+  if (!dateStr) dateStr = todayStr;
 
-  // 拉取今日打卡记录，并转换为 药名_时间 格式的 key
-  var todayRecords = await sb.from('daily_records')
+  // 拉取指定日期的打卡记录
+  var dayRecords = await sb.from('daily_records')
     .select('*, medications(name)')
     .eq('user_id', userId)
-    .eq('record_date', todayStr);
+    .eq('record_date', dateStr);
 
-  // 同时获取药品列表建立 id → name 映射
+  // 获取药品列表建立 id → name 映射
   var allMeds = await sb.from('medications').select('id, name').eq('user_id', userId);
   var idToName = {};
   if (allMeds.data) {
     allMeds.data.forEach(function(m) { idToName[m.id] = m.name; });
   }
 
-  if (todayRecords.data && todayRecords.data.length > 0) {
-    var records = {};
-    todayRecords.data.forEach(function(r) {
+  var records = {};
+  if (dayRecords.data && dayRecords.data.length > 0) {
+    dayRecords.data.forEach(function(r) {
       var medName = (r.medications && r.medications.name) || idToName[r.medication_id] || r.medication_id;
       var key = medName + '_' + (r.time_slot || '0');
       if (r.status === 'done') {
-        // 从 taken_at 提取 HH:MM
         var timeStr = '';
         if (r.taken_at) {
           var d = new Date(r.taken_at);
@@ -120,22 +120,30 @@ async function loadFromCloud() {
         records[key] = 'skip_' + (r.skip_reason || '');
       }
     });
+  }
+
+  // 如果是今天，更新全局 medRecords
+  if (dateStr === todayStr) {
     medRecords = records;
     localStorage.setItem('yygh_med_' + todayStr, JSON.stringify(records));
   }
 
-  // 拉取库存
-  var medsResult = await sb.from('medications')
-    .select('name, stock_count')
-    .eq('user_id', userId);
-  if (medsResult.data && medsResult.data.length > 0) {
-    var stock = {};
-    medsResult.data.forEach(function(m) {
-      stock[m.name] = m.stock_count;
-    });
-    stockData = stock;
-    localStorage.setItem('yygh_stock', JSON.stringify(stock));
+  // 拉取库存（只在加载今天时更新）
+  if (dateStr === todayStr) {
+    var medsResult = await sb.from('medications')
+      .select('name, stock_count')
+      .eq('user_id', userId);
+    if (medsResult.data && medsResult.data.length > 0) {
+      var stock = {};
+      medsResult.data.forEach(function(m) {
+        stock[m.name] = m.stock_count;
+      });
+      stockData = stock;
+      localStorage.setItem('yygh_stock', JSON.stringify(stock));
+    }
   }
+
+  return records;
 }
 
 var todayStr = new Date().toISOString().slice(0, 10);

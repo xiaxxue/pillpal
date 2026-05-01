@@ -468,9 +468,11 @@
 
           <section class="section-block">
             <div class="section-header">
-              <h3>今日用药</h3>
+              <h3 id="realTimelineTitle">今日用药</h3>
               <span class="section-link" onclick="openAddMedModal()">+ 添加药品</span>
             </div>
+            <!-- 日期选择器 -->
+            <div class="real-date-picker" id="realDatePicker"></div>
             <div class="med-progress">
               <div class="prog-bar"><div class="prog-fill" id="realProgFill" style="width:0%"></div></div>
               <div class="prog-text" id="realProgText">已完成 0/0 次服药</div>

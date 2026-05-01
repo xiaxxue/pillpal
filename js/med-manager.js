@@ -197,7 +197,11 @@ async function handleAddMed() {
 }
 
 // 从数据库加载药品并生成时间轴
-async function refreshTimeline() {
+// dateStr: 要显示的日期（YYYY-MM-DD），不传默认今天
+// dateRecords: 该日期的打卡记录对象，不传则用全局 medRecords
+async function refreshTimeline(dateStr, dateRecords) {
+  if (!dateStr) dateStr = todayStr;
+  var isToday = (dateStr === todayStr);
   var meds = await getMedications();
 
   var emptyState = document.getElementById('emptyState');
@@ -209,7 +213,6 @@ async function refreshTimeline() {
     return;
   }
 
-  // 有药品，显示真实数据区域，隐藏空状态
   if (emptyState) emptyState.style.display = 'none';
   if (realHome) realHome.style.display = '';
 
@@ -232,8 +235,8 @@ async function refreshTimeline() {
     }
   });
 
-  // 读取今日打卡记录
-  var todayRecords = medRecords; // 来自 app.js 的全局变量
+  // 读取打卡记录（传入的或全局的）
+  var dayRecords = dateRecords || medRecords;
   var doneCount = 0;
 
   // 生成时间轴 HTML（写入真实数据区域）
@@ -264,7 +267,7 @@ async function refreshTimeline() {
       totalMeds++;
       // 检查此药此时段是否已打卡
       var medKey = med.name + '_' + slot.hour;
-      var record = todayRecords[medKey];
+      var record = dayRecords[medKey];
       var isDone = record && record.startsWith('done_');
       var isSkipped = record && record.startsWith('skip_');
 
@@ -298,21 +301,32 @@ async function refreshTimeline() {
         html += '</div>';
       } else {
         // 未打卡状态
-        var cardClass = isCurrent ? 'active-card' : (isPast ? 'past-card' : 'upcoming-card');
-        html += '<div class="med-card ' + cardClass + '" data-med-id="' + (med.id || '') + '">';
-        html += '<div class="mc-left">';
-        html += '<div class="mc-name">' + escapeHtml(med.name) + '</div>';
-        html += '<div class="mc-detail">' + escapeHtml(med.dosage) + ' · ' + escapeHtml(med.condition) + '</div>';
-        html += '<div class="mc-disease">' + escapeHtml(med.disease) + '</div>';
-        if (med.note) html += '<div class="mc-note">&#9432; ' + escapeHtml(med.note) + '</div>';
-        html += '</div>';
-        html += '<div class="mc-actions">';
-        html += '<button class="btn-take-full" onclick="takeMedCard(this)">&#10003; 已服用</button>';
-        html += '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>';
-        html += '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>';
-        html += '</div>';
-        html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
-        html += '</div>';
+        if (isToday) {
+          var cardClass = isCurrent ? 'active-card' : (isPast ? 'past-card' : 'upcoming-card');
+          html += '<div class="med-card ' + cardClass + '" data-med-id="' + (med.id || '') + '">';
+          html += '<div class="mc-left">';
+          html += '<div class="mc-name">' + escapeHtml(med.name) + '</div>';
+          html += '<div class="mc-detail">' + escapeHtml(med.dosage) + ' · ' + escapeHtml(med.condition) + '</div>';
+          html += '<div class="mc-disease">' + escapeHtml(med.disease) + '</div>';
+          if (med.note) html += '<div class="mc-note">&#9432; ' + escapeHtml(med.note) + '</div>';
+          html += '</div>';
+          html += '<div class="mc-actions">';
+          html += '<button class="btn-take-full" onclick="takeMedCard(this)">&#10003; 已服用</button>';
+          html += '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>';
+          html += '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>';
+          html += '</div>';
+          html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
+          html += '</div>';
+        } else {
+          // 非今天：只读，显示"未服用"
+          html += '<div class="med-card" data-med-id="' + (med.id || '') + '" style="flex-direction:row;opacity:0.6">';
+          html += '<div class="mc-left">';
+          html += '<div class="mc-name">' + escapeHtml(med.name) + '</div>';
+          html += '<div class="mc-detail">' + escapeHtml(med.dosage) + '</div>';
+          html += '</div>';
+          html += '<div class="mc-right"><span class="mc-status-done" style="color:var(--text-third)">未服用</span></div>';
+          html += '</div>';
+        }
 
         // 未打卡 + 时间未过 = 下一个提醒
         if (!nextTime && slot.hour > currentHour) {
@@ -410,6 +424,51 @@ function updateStockFromMeds(meds) {
   if (realWeeklyCount) realWeeklyCount.textContent = totalWeekly;
 }
 
+// 生成日期选择器（前3天 + 今天 + 后3天）
+function buildRealDatePicker() {
+  var picker = document.getElementById('realDatePicker');
+  if (!picker) return;
+  var today = new Date();
+  var weekNames = ['周日','周一','周二','周三','周四','周五','周六'];
+  var html = '';
+  for (var i = -3; i <= 3; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var dateStr = d.toISOString().slice(0, 10);
+    var day = d.getDate();
+    var label = '';
+    if (i === -1) label = '昨天';
+    else if (i === 0) label = '今天';
+    else if (i === 1) label = '明天';
+    else label = weekNames[d.getDay()];
+    var activeClass = (i === 0) ? ' active' : '';
+    html += '<div class="real-date-item' + activeClass + '" data-date="' + dateStr + '" onclick="switchRealDate(this)">';
+    html += '<div class="real-date-week">' + label + '</div>';
+    html += '<div class="real-date-day">' + day + '</div>';
+    html += '</div>';
+  }
+  picker.innerHTML = html;
+}
+
+var currentViewDate = todayStr;
+
+async function switchRealDate(el) {
+  document.querySelectorAll('.real-date-item').forEach(function(d) { d.classList.remove('active'); });
+  el.classList.add('active');
+  var dateStr = el.getAttribute('data-date');
+  currentViewDate = dateStr;
+
+  // 更新标题
+  var title = document.getElementById('realTimelineTitle');
+  if (title) {
+    title.textContent = (dateStr === todayStr) ? '今日用药' : dateStr + ' 用药记录';
+  }
+
+  // 从云端加载该日期的打卡记录
+  var records = await loadFromCloud(dateStr);
+  await refreshTimeline(dateStr, records);
+}
+
 // 页面加载后：登录用户隐藏假数据，显示真实数据
 async function initMedData() {
   var user = null;
@@ -433,14 +492,18 @@ async function initMedData() {
   if (mockBox) { mockBox.style.display = 'none'; console.log('mockDataBox 已隐藏'); }
   if (realBox) { realBox.style.display = ''; console.log('realDataBox 已显示'); }
 
-  // 从数据库加载药品
-  var meds = await getMedications();
+  // 先从云端拉取今日打卡记录（确保 medRecords 有数据）
+  await loadFromCloud(todayStr);
 
-  // 更新顶栏副标题和AI建议
+  // 生成日期选择器
+  buildRealDatePicker();
+
+  // 再加载药品并渲染
+  var meds = await getMedications();
   updateTopBarWithData(meds);
 
   if (meds.length > 0) {
-    await refreshTimeline();
+    await refreshTimeline(todayStr, medRecords);
     generateRiskAlerts(meds);
   } else {
     // 没有药品，显示空状态
