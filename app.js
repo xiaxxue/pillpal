@@ -44,7 +44,10 @@ function syncToCloud(key, value) {
 
         Object.keys(value).forEach(function(medKey) {
           var realId = medMap[medKey];
-          if (!realId) return; // 找不到对应药品，跳过
+          if (!realId) return;
+
+          // 从 medKey 提取时间段，如 "氨氯地平片_7" → "7"
+          var timeSlot = medKey.split('_').pop();
 
           var record = value[medKey];
           var status = record.startsWith('done') ? 'done' : 'skip';
@@ -54,10 +57,11 @@ function syncToCloud(key, value) {
             user_id: userId,
             medication_id: realId,
             record_date: dateStr,
+            time_slot: timeSlot,
             status: status,
             taken_at: takenAt,
             skip_reason: skipReason
-          }, { onConflict: 'user_id, medication_id, record_date', ignoreDuplicates: false }).then(function(){});
+          }, { onConflict: 'user_id, medication_id, record_date, time_slot', ignoreDuplicates: false }).then(function(){});
         });
       });
     }
