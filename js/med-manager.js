@@ -444,9 +444,8 @@ function buildRealDatePicker(centerDate) {
     var dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     var day = d.getDate();
 
-    // 跨月显示月份
-    var month = d.getMonth() + 1;
-    var dayLabel = (i === -3 || day === 1) ? month + '/' + day : '' + day;
+    // 统一只显示日期数字，不加月份前缀
+    var dayLabel = '' + day;
 
     // 判断标签
     var diff = Math.round((d - today) / 86400000);
