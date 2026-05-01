@@ -2166,10 +2166,13 @@
   <script src="js/onboard.js"></script>
   <script src="js/family-mode.js"></script>
   <script>
-  // 注册 Service Worker
+  // 清除旧的 Service Worker（开发阶段不使用缓存）
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').then(function() {
-      console.log('Service Worker 注册成功');
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      regs.forEach(function(reg) { reg.unregister(); });
+    });
+    caches.keys().then(function(keys) {
+      keys.forEach(function(key) { caches.delete(key); });
     });
   }
 
