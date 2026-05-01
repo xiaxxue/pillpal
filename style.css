@@ -951,6 +951,7 @@ input { font-family: inherit; font-size: inherit; }
   padding: 28px 24px;
   width: 85%;
   max-width: 360px;
+  position: relative;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
