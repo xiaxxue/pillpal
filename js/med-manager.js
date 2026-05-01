@@ -484,6 +484,10 @@ async function jumpToDate(dateStr) {
   buildRealDatePicker();
   var title = document.getElementById('realTimelineTitle');
   if (title) title.textContent = (dateStr === todayStr) ? '今日用药' : dateStr + ' 用药记录';
+
+  var timeline = document.getElementById('realTimeline');
+  if (timeline) timeline.innerHTML = '<div style="text-align:center;padding:30px 0;color:var(--text-sec)">加载中...</div>';
+
   var records = await loadFromCloud(dateStr);
   await refreshTimeline(dateStr, records);
 }
@@ -499,6 +503,10 @@ async function switchRealDate(el) {
 
   var jumpInput = document.getElementById('dateJumpInput');
   if (jumpInput) jumpInput.value = dateStr;
+
+  // 显示加载中
+  var timeline = document.getElementById('realTimeline');
+  if (timeline) timeline.innerHTML = '<div style="text-align:center;padding:30px 0;color:var(--text-sec)">加载中...</div>';
 
   var records = await loadFromCloud(dateStr);
   await refreshTimeline(dateStr, records);
