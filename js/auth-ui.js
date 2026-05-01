@@ -23,11 +23,16 @@ async function checkAuthState() {
   if (user) {
     hideAuthModal();
     updateUserDisplay(user);
+    // 直接进患者模式
+    document.getElementById('tab-bar-main').style.display = '';
+    switchTab('tab-home');
     await migrateLocalData();
     if (typeof loadFromCloud === 'function') await loadFromCloud();
     if (typeof initPush === 'function') initPush();
     if (typeof initMedData === 'function') await initMedData();
     if (typeof checkOnboarding === 'function') await checkOnboarding();
+    // 检查是否有绑定家人，有则显示家属Tab
+    if (typeof checkFamilyTab === 'function') await checkFamilyTab();
   }
   // 未登录，显示登录弹窗（默认已显示）
 
@@ -102,12 +107,15 @@ async function handleLogin() {
     } else {
       hideAuthModal();
       showToast('登录成功，正在同步数据...');
+      document.getElementById('tab-bar-main').style.display = '';
+      switchTab('tab-home');
       await migrateLocalData();
       if (typeof loadFromCloud === 'function') await loadFromCloud();
       if (typeof initPush === 'function') initPush();
       if (typeof initMedData === 'function') await initMedData();
       updateUserDisplay(result.data.user);
       if (typeof checkOnboarding === 'function') await checkOnboarding();
+      if (typeof checkFamilyTab === 'function') await checkFamilyTab();
       showToast('数据同步完成');
     }
   } catch(e) {
