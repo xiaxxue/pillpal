@@ -3143,10 +3143,9 @@ input { font-family: inherit; font-size: inherit; }
 }
 .real-date-arrow:active { background: var(--primary-light); color: var(--primary); }
 .real-date-picker {
-  display: flex; gap: 6px; padding: 10px 0; overflow-x: auto;
-  flex: 1; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  display: flex; justify-content: space-between;
+  padding: 10px 0; flex: 1;
 }
-.real-date-picker::-webkit-scrollbar { display: none; }
 .real-date-jump {
   display: flex; align-items: center; gap: 8px;
   padding: 4px 0 10px;
@@ -3160,8 +3159,9 @@ input { font-family: inherit; font-size: inherit; }
 .real-date-jump-label { font-size: 12px; color: var(--text-third); }
 .real-date-item {
   display: flex; flex-direction: column; align-items: center;
-  padding: 8px 14px; border-radius: var(--radius-sm);
-  cursor: pointer; transition: all .2s; min-width: 52px;
+  padding: 8px 0; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all .2s;
+  flex: 1; min-width: 0;
 }
 .real-date-item:hover { background: var(--primary-light); }
 .real-date-item.active { background: var(--primary); color: #fff; }
