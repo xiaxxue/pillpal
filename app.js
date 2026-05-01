@@ -324,18 +324,44 @@ function initTimeline(offset) {
 }
 
 function updateAllProgress() {
-  const doneCount = document.querySelectorAll('#page-home .med-card.done').length;
-  const totalCount = document.querySelectorAll('#page-home .med-card').length;
+  // 统计真实数据区域的打卡数
+  var realTimeline = document.getElementById('realTimeline');
+  var doneCount, totalCount;
 
-  // 更新进度条
-  const fill = document.querySelector('.prog-fill');
-  const text = document.querySelector('.prog-text');
-  if (fill) fill.style.width = Math.round(doneCount / totalCount * 100) + '%';
-  if (text) text.textContent = '已完成 ' + doneCount + '/' + totalCount + ' 次服药';
+  if (realTimeline && realTimeline.children.length > 0) {
+    doneCount = realTimeline.querySelectorAll('.med-card.done').length;
+    totalCount = realTimeline.querySelectorAll('.med-card').length;
 
-  // 更新今日概览的已服数
-  const summaryEl = document.querySelector('.s-card-num .done');
-  if (summaryEl) summaryEl.textContent = doneCount;
+    // 更新真实数据区域
+    var realFill = document.getElementById('realProgFill');
+    var realText = document.getElementById('realProgText');
+    var pct = totalCount > 0 ? Math.round(doneCount / totalCount * 100) : 0;
+    if (realFill) realFill.style.width = pct + '%';
+    if (realText) realText.textContent = '已完成 ' + doneCount + '/' + totalCount + ' 次服药';
+
+    var realDone = document.getElementById('realDone');
+    var realTotal = document.getElementById('realTotal');
+    if (realDone) realDone.textContent = doneCount;
+    if (realTotal) realTotal.textContent = totalCount;
+
+    // 更新下次提醒
+    var realNextTime = document.getElementById('realNextTime');
+    if (realNextTime) {
+      if (doneCount >= totalCount) {
+        realNextTime.textContent = '全部完成';
+      }
+    }
+  } else {
+    // 假数据区域兜底
+    doneCount = document.querySelectorAll('#page-home .med-card.done').length;
+    totalCount = document.querySelectorAll('#page-home .med-card').length;
+    var fill = document.querySelector('.prog-fill');
+    var text = document.querySelector('.prog-text');
+    if (fill) fill.style.width = Math.round(doneCount / totalCount * 100) + '%';
+    if (text) text.textContent = '已完成 ' + doneCount + '/' + totalCount + ' 次服药';
+    var summaryEl = document.querySelector('.s-card-num .done');
+    if (summaryEl) summaryEl.textContent = doneCount;
+  }
 }
 
 // ====== 动态生成日期选择器 ======
