@@ -61,7 +61,11 @@ function syncToCloud(key, value) {
             status: status,
             taken_at: takenAt,
             skip_reason: skipReason
-          }, { onConflict: 'user_id, medication_id, record_date, time_slot', ignoreDuplicates: false }).then(function(){});
+          }, { onConflict: 'user_id, medication_id, record_date, time_slot', ignoreDuplicates: false })
+          .then(function(res) {
+            if (res.error) console.error('打卡同步失败:', res.error.message);
+            else console.log('打卡已同步:', medKey, status);
+          });
         });
       });
     }
@@ -86,18 +90,34 @@ async function loadFromCloud() {
   if (!result.data || !result.data.user) return;
   var userId = result.data.user.id;
 
-  // 拉取今日打卡记录
+  // 拉取今日打卡记录，并转换为 药名_时间 格式的 key
   var todayRecords = await sb.from('daily_records')
-    .select('*')
+    .select('*, medications(name)')
     .eq('user_id', userId)
     .eq('record_date', todayStr);
+
+  // 同时获取药品列表建立 id → name 映射
+  var allMeds = await sb.from('medications').select('id, name').eq('user_id', userId);
+  var idToName = {};
+  if (allMeds.data) {
+    allMeds.data.forEach(function(m) { idToName[m.id] = m.name; });
+  }
+
   if (todayRecords.data && todayRecords.data.length > 0) {
     var records = {};
     todayRecords.data.forEach(function(r) {
+      var medName = (r.medications && r.medications.name) || idToName[r.medication_id] || r.medication_id;
+      var key = medName + '_' + (r.time_slot || '0');
       if (r.status === 'done') {
-        records[r.medication_id] = 'done_' + (r.taken_at || '');
+        // 从 taken_at 提取 HH:MM
+        var timeStr = '';
+        if (r.taken_at) {
+          var d = new Date(r.taken_at);
+          timeStr = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+        records[key] = 'done_' + timeStr;
       } else if (r.status === 'skip') {
-        records[r.medication_id] = 'skip_' + (r.skip_reason || '');
+        records[key] = 'skip_' + (r.skip_reason || '');
       }
     });
     medRecords = records;
