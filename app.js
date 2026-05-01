@@ -535,6 +535,7 @@ function confirmSkip(reason) {
     saveData('med_' + todayStr, medRecords);
   }
   document.getElementById('skipModal').classList.remove('show');
+  updateAllProgress();
   showToast('已记录跳过原因');
 }
 
@@ -1152,15 +1153,18 @@ function undoMed(btn) {
   const card = btn.closest('.med-card');
   card.classList.remove('done');
   card.classList.add('active-card');
-  card.style.flexDirection = 'column';
-  card.style.alignItems = 'stretch';
+  card.style.flexDirection = '';
+  card.style.alignItems = '';
+  card.style.opacity = '';
   const right = card.querySelector('.mc-right');
-  right.outerHTML =
-    '<div class="mc-actions">' +
-      '<button class="btn-take-full" onclick="takeMedCard(this)">&#10003; 已服用</button>' +
-      '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>' +
-      '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>' +
-    '</div>';
+  if (right) {
+    right.outerHTML =
+      '<div class="mc-actions">' +
+        '<button class="btn-take-full" onclick="takeMedCard(this)">&#10003; 已服用</button>' +
+        '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>' +
+        '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>' +
+      '</div>';
+  }
   // 删除本地记录
   var undoKey = getMedKey(card);
   delete medRecords[undoKey];
@@ -1169,7 +1173,8 @@ function undoMed(btn) {
   deleteCloudRecord(undoKey);
   // 撤回时恢复库存
   restoreStock(card);
-  updateAllProgress();
+  // 立即更新进度
+  setTimeout(function() { updateAllProgress(); }, 50);
   showToast('已撤回，请重新确认服药');
 }
 
