@@ -226,6 +226,11 @@ async function refreshTimeline(dateStr, dateRecords) {
   };
 
   meds.forEach(function(med) {
+    // 只显示创建日期当天及之后的药品
+    if (med.created_at) {
+      var createdDate = med.created_at.slice(0, 10); // "2026-05-01"
+      if (dateStr < createdDate) return; // 查看的日期早于药品添加日期，跳过
+    }
     if (med.times && med.times.length > 0) {
       med.times.forEach(function(t) {
         if (timeSlots[t]) {
