@@ -1014,7 +1014,7 @@
       <div class="profile-user">
         <div class="profile-avatar">张</div>
         <div class="profile-info">
-          <div class="profile-name">张建国</div>
+          <div class="profile-name"></div>
           <div class="profile-tags">
             <span class="p-tag">高血压</span>
             <span class="p-tag">2型糖尿病</span>
@@ -1221,30 +1221,30 @@
     <!-- ===== 家属 - 帮问诊 ===== -->
     <div class="page" id="page-fm-visit">
       <header class="page-header">
-        <h2>帮爸爸问诊</h2>
+        <h2>帮家人问诊</h2>
       </header>
       <main class="content">
         <!-- 代问诊说明 -->
         <div class="fm-visit-tip">
           <div class="fm-visit-tip-icon">&#128100;</div>
-          <div class="fm-visit-tip-text">您正在以<strong>家属身份</strong>代爸爸问诊，医生将知晓是家属代为沟通</div>
+          <div class="fm-visit-tip-text">您正在以<strong>家属身份</strong>代家人问诊，医生将知晓是家属代为沟通</div>
         </div>
 
         <!-- 快捷入口 -->
         <div class="visit-quick-entries">
           <div class="vq-card" onclick="openBooking('text')">
             <div class="vq-icon">&#128172;</div>
-            <div class="vq-name">代爸爸图文问诊</div>
-            <div class="vq-desc">用文字和医生沟通爸爸的病情</div>
+            <div class="vq-name">代家人图文问诊</div>
+            <div class="vq-desc">用文字和医生沟通家人的病情</div>
           </div>
           <div class="vq-card" onclick="openBooking('phone')">
             <div class="vq-icon">&#128222;</div>
-            <div class="vq-name">代爸爸电话问诊</div>
-            <div class="vq-desc">医生回拨给您，代爸爸说明情况</div>
+            <div class="vq-name">代家人电话问诊</div>
+            <div class="vq-desc">医生回拨给您，代家人说明情况</div>
           </div>
-          <div class="vq-card" onclick="showToast('已帮爸爸发起续方申请，等待医师审核')">
+          <div class="vq-card" onclick="showToast('已帮家人发起续方申请，等待医师审核')">
             <div class="vq-icon">&#128203;</div>
-            <div class="vq-name">帮爸爸续方</div>
+            <div class="vq-name">帮家人续方</div>
             <div class="vq-desc">复用上次处方，无需问诊</div>
           </div>
         </div>
@@ -1253,7 +1253,7 @@
         <div class="pending-visit-card" id="fmPendingVisit" style="display:none">
           <div class="pv-status-bar">
             <span class="pv-status-dot"></span>
-            <span class="pv-status-text">待问诊（代爸爸）</span>
+            <span class="pv-status-text">待问诊（代家人）</span>
           </div>
           <div class="pv-body">
             <div class="pv-doctor-row">
@@ -1264,18 +1264,18 @@
               </div>
             </div>
             <div class="pv-attach">
-              <span>&#10003; 已附带爸爸的服药记录</span>
-              <span>&#10003; 已附带爸爸的用药方案</span>
-              <span>&#10003; 已附带爸爸的库存情况</span>
+              <span>&#10003; 已附带家人的服药记录</span>
+              <span>&#10003; 已附带家人的用药方案</span>
+              <span>&#10003; 已附带家人的库存情况</span>
               <span>&#128100; 已标注家属代问诊</span>
             </div>
             <button class="pv-enter-btn" onclick="enterFmConsultation()">进入问诊</button>
           </div>
         </div>
 
-        <!-- 爸爸的医生 -->
+        <!-- 家人的医生 -->
         <section class="section-block">
-          <div class="section-header"><h3>爸爸的医生</h3></div>
+          <div class="section-header"><h3>家人的医生</h3></div>
           <div class="doctor-card" onclick="openBooking('text')">
             <div class="doc-avatar">李</div>
             <div class="doc-info">
@@ -1306,9 +1306,9 @@
           </div>
         </section>
 
-        <!-- 爸爸的问诊记录 -->
+        <!-- 家人的问诊记录 -->
         <section class="section-block">
-          <div class="section-header"><h3>爸爸的问诊记录</h3></div>
+          <div class="section-header"><h3>家人的问诊记录</h3></div>
           <div class="rx-list">
             <div class="rx-card">
               <div class="rx-top-row">
@@ -1337,14 +1337,14 @@
     <div class="page page-chat" id="page-fm-ai">
       <header class="page-header">
         <h2>小团用药助手</h2>
-        <div class="ai-disclaimer">帮您远程了解爸爸的用药情况</div>
+        <div class="ai-disclaimer">帮您远程了解家人的用药情况</div>
       </header>
       <div class="chat-scroll" id="fmChatScroll">
         <div class="content chat-content">
           <div class="chat-welcome">
             <div class="chat-ai-avatar">&#129432;</div>
-            <div class="chat-welcome-text">
-              小明你好！爸爸今天已完成 3/5 次服药，氨氯地平还剩 6 天用量。有什么需要我帮忙的吗？
+            <div class="chat-welcome-text" id="fmWelcomeText">
+              你好！绑定家人后，我可以帮你查看他们的服药情况、库存状态，提醒他们按时吃药。
             </div>
           </div>
 
@@ -1366,7 +1366,7 @@
       </div>
       <div class="chat-input-bar">
         <button class="plus-btn" onclick="toggleFmPlusMenu()">+</button>
-        <input type="text" id="fmChatInput" placeholder="问问爸爸的用药情况..." onkeydown="if(event.key==='Enter')fmSendChat()">
+        <input type="text" id="fmChatInput" placeholder="问问家人的用药情况..." onkeydown="if(event.key==='Enter')fmSendChat()">
         <button class="chat-send" onclick="fmSendChat()">&#10148;</button>
       </div>
     </div>
@@ -1967,7 +1967,7 @@
         <div class="consult-chat-scroll" id="fmConsultChatScroll">
           <div class="consult-chat-area" id="fmConsultChatArea">
             <div class="consult-system-msg">
-              <div class="csm-title">系统已自动发送爸爸的资料给医生</div>
+              <div class="csm-title">系统已自动发送家人的资料给医生</div>
               <div class="csm-cards">
                 <div class="csm-card">
                   <div class="csm-card-title">近 7 日服药记录</div>
@@ -1984,12 +1984,12 @@
               </div>
             </div>
             <div class="consult-system-msg" style="background:#e3f2fd;margin-top:10px">
-              <div class="csm-title" style="color:#1565c0">&#128100; 家属代问诊 · 儿子张小明代为沟通</div>
+              <div class="csm-title" style="color:#1565c0">&#128100; 家属代问诊</div>
             </div>
             <div class="consult-msg doctor">
               <div class="consult-msg-avatar">李</div>
               <div class="consult-msg-bubble">
-                您好，我是李建华医生。我看到这次是家属代为问诊，请问您是患者张建国的什么人？<br><br>我已经收到张叔叔的用药记录和库存情况，氨氯地平快用完了。请问他最近身体状况怎么样？
+                您好，我是医生。我看到这次是家属代为问诊，请问您和患者是什么关系？<br><br>我已经收到患者的用药记录和库存情况，请问他最近身体状况怎么样？
               </div>
             </div>
           </div>
@@ -2112,7 +2112,7 @@
         <div class="order-section">
           <div class="order-section-title">收货信息</div>
           <div class="order-address">
-            <div class="oa-name">张建国 <span class="oa-phone">138****1234</span></div>
+            <div class="oa-name" id="orderAddrName">收件人 <span class="oa-phone"></span></div>
             <div class="oa-detail">北京市朝阳区XX小区XX号楼</div>
           </div>
         </div>
