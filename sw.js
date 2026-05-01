@@ -1,7 +1,7 @@
 // ====== Service Worker ======
 // 负责离线缓存和推送通知
 
-var CACHE_NAME = 'pillpal-v5';
+var CACHE_NAME = 'pillpal-v6';
 var ASSETS = [
   './',
   './index.html',

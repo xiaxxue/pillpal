@@ -425,7 +425,8 @@ function updateStockFromMeds(meds) {
 }
 
 // 日期选择器：以 centerDate 为中心显示 7 天
-var datePickerCenter = new Date(); // 当前显示的中心日期
+var datePickerCenter = new Date();
+datePickerCenter.setHours(12, 0, 0, 0); // 设为中午12点，避免时区偏移
 var currentViewDate = todayStr;
 
 function buildRealDatePicker(centerDate) {
@@ -439,6 +440,7 @@ function buildRealDatePicker(centerDate) {
   for (var i = -3; i <= 3; i++) {
     var d = new Date(datePickerCenter);
     d.setDate(datePickerCenter.getDate() + i);
+    d.setHours(12, 0, 0, 0); // 避免时区偏移
     var dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     var day = d.getDate();
 
@@ -473,6 +475,7 @@ function buildRealDatePicker(centerDate) {
 // 左右翻页
 function shiftDateRange(days) {
   datePickerCenter.setDate(datePickerCenter.getDate() + days);
+  datePickerCenter.setHours(12, 0, 0, 0);
   buildRealDatePicker();
 }
 
@@ -480,7 +483,7 @@ function shiftDateRange(days) {
 async function jumpToDate(dateStr) {
   if (!dateStr) return;
   currentViewDate = dateStr;
-  datePickerCenter = new Date(dateStr);
+  datePickerCenter = new Date(dateStr + 'T12:00:00');
   buildRealDatePicker();
   var title = document.getElementById('realTimelineTitle');
   if (title) title.textContent = (dateStr === todayStr) ? '今日用药' : dateStr + ' 用药记录';
