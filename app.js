@@ -11,6 +11,13 @@ function loadData(key, fallback) {
   } catch(e) { return fallback; }
 }
 
+// 时间标签转小时数：如 "晨起 7:00" → 7, "午餐后 14:30" → 14.5
+function parseTimeLabel(label) {
+  var match = label.match(/(\d+):(\d+)/);
+  if (match) return parseInt(match[1]) + parseInt(match[2]) / 60;
+  return 0;
+}
+
 // 后台同步到 Supabase（不阻塞界面）
 function syncToCloud(key, value) {
   if (!sb) return;
@@ -21,19 +28,37 @@ function syncToCloud(key, value) {
     // 打卡记录同步
     if (key.startsWith('med_')) {
       var dateStr = key.replace('med_', '');
-      Object.keys(value).forEach(function(medKey) {
-        var record = value[medKey];
-        var status = record.startsWith('done') ? 'done' : 'skip';
-        var takenAt = status === 'done' ? record.replace('done_', '') : null;
-        var skipReason = status === 'skip' ? record.replace('skip_', '') : null;
-        sb.from('daily_records').upsert({
-          user_id: userId,
-          medication_id: medKey,
-          record_date: dateStr,
-          status: status,
-          taken_at: takenAt,
-          skip_reason: skipReason
-        }, { onConflict: 'user_id, medication_id, record_date', ignoreDuplicates: false }).then(function(){});
+      // 先查出所有药品，建立 name_time → id 的映射
+      sb.from('medications').select('id, name, times').eq('user_id', userId).then(function(medsResult) {
+        if (!medsResult.data) return;
+        var medMap = {};
+        medsResult.data.forEach(function(m) {
+          if (m.times) {
+            m.times.forEach(function(t) {
+              // 从时间标签提取小时数，如 "晨起 7:00" → 7, "午餐后 14:30" → 14.5
+              var hour = parseTimeLabel(t);
+              medMap[m.name + '_' + hour] = m.id;
+            });
+          }
+        });
+
+        Object.keys(value).forEach(function(medKey) {
+          var realId = medMap[medKey];
+          if (!realId) return; // 找不到对应药品，跳过
+
+          var record = value[medKey];
+          var status = record.startsWith('done') ? 'done' : 'skip';
+          var takenAt = status === 'done' ? dateStr + 'T' + record.replace('done_', '') + ':00' : null;
+          var skipReason = status === 'skip' ? record.replace('skip_', '') : null;
+          sb.from('daily_records').upsert({
+            user_id: userId,
+            medication_id: realId,
+            record_date: dateStr,
+            status: status,
+            taken_at: takenAt,
+            skip_reason: skipReason
+          }, { onConflict: 'user_id, medication_id, record_date', ignoreDuplicates: false }).then(function(){});
+        });
       });
     }
 
