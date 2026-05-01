@@ -30,6 +30,18 @@ async function initFamilyMode() {
   boundPatientName = (patientProfile && patientProfile.display_name) || '患者';
   var relation = link.relation || '家人';
 
+  // 更新顶栏
+  var topBar = document.querySelector('#page-fm-home .fm-top-bar');
+  if (topBar) {
+    topBar.style.display = '';
+    var avatar = topBar.querySelector('.fm-avatar');
+    if (avatar) avatar.textContent = boundPatientName.charAt(0);
+    var topName = topBar.querySelector('.fm-top-name');
+    if (topName) topName.textContent = relation + ' · ' + boundPatientName;
+    var topSub = topBar.querySelector('.fm-top-sub');
+    if (topSub) topSub.textContent = '正在为' + boundPatientName + '管理用药';
+  }
+
   // 隐藏假数据，加载真实数据
   hideFmMockData();
   await loadPatientHome(boundPatientId, boundPatientName, relation);
@@ -49,6 +61,10 @@ function hideFmMockData() {
 function showFmEmptyState() {
   var mocks = document.querySelectorAll('.fm-mock-data');
   mocks.forEach(function(el) { el.style.display = 'none'; });
+
+  // 隐藏顶栏假数据
+  var topBar = document.querySelector('#page-fm-home .fm-top-bar');
+  if (topBar) topBar.style.display = 'none';
 
   // 在监护首页显示引导
   var homeContent = document.querySelector('#page-fm-home .content');
