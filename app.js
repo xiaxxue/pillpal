@@ -430,7 +430,6 @@ const tabMap = {
   'tab-box': 'page-box',
   'tab-renew': 'page-renew',
   'tab-ai': 'page-ai',
-  'tab-family': 'page-fm-home',
   'tab-profile': 'page-profile'
 };
 
@@ -439,11 +438,8 @@ function switchTab(tabId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
   document.getElementById(tabMap[tabId]).classList.add('active');
+  // 滚动到顶部
   document.getElementById(tabMap[tabId]).scrollTop = 0;
-  // 切到家属Tab时加载数据
-  if (tabId === 'tab-family' && typeof initFamilyMode === 'function') {
-    initFamilyMode();
-  }
 }
 
 // ====== 日期选择 ======
@@ -1878,10 +1874,8 @@ async function handleBindFamily() {
     document.getElementById('familyInviteSection').style.display = 'none';
     document.getElementById('familyBindResult').style.display = '';
     document.getElementById('bindResultTitle').textContent = '绑定成功！';
-    document.getElementById('bindResultDesc').textContent = '您已绑定为' + selectedRelation + '，底部已出现「家属」Tab';
+    document.getElementById('bindResultDesc').textContent = '您已绑定为' + selectedRelation + '，可以远程查看患者的用药情况';
     showToast('家属绑定成功');
-    // 立即显示家属Tab
-    if (typeof checkFamilyTab === 'function') checkFamilyTab();
   }
 }
 
@@ -2032,15 +2026,41 @@ function setFontSize(btn, className) {
   }
 })();
 
-// ====== 检查家属绑定，动态显示家属Tab ======
-async function checkFamilyTab() {
-  var user = await getCurrentUser();
-  if (!user) return;
-  var patients = await getMyPatients();
-  var familyTab = document.getElementById('tab-family');
-  if (familyTab) {
-    familyTab.style.display = patients.length > 0 ? '' : 'none';
+// ====== 启动页角色选择 ======
+
+function selectRole(role) {
+  // 隐藏启动页
+  document.getElementById('page-launch').classList.remove('active');
+
+  if (role === 'patient') {
+    // 显示患者导航和首页
+    inFamilyMode = false;
+    document.getElementById('tab-bar-main').style.display = '';
+    document.getElementById('familyTabBar').style.display = 'none';
+    switchTab('tab-home');
+  } else {
+    // 显示家属导航和监护首页
+    inFamilyMode = true;
+    document.getElementById('tab-bar-main').style.display = 'none';
+    document.getElementById('familyTabBar').style.display = '';
+    // 重置家属tab
+    document.querySelectorAll('#familyTabBar .tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('fm-tab-home').classList.add('active');
+    document.getElementById('page-fm-home').classList.add('active');
+    if (typeof buildFamilyDatePicker === 'function') buildFamilyDatePicker();
+    // 加载真实患者数据
+    if (typeof initFamilyMode === 'function') initFamilyMode();
   }
+}
+
+function backToRoleSelect() {
+  inFamilyMode = false;
+  // 隐藏所有页面和导航
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-bar-main').style.display = 'none';
+  document.getElementById('familyTabBar').style.display = 'none';
+  // 显示启动页
+  document.getElementById('page-launch').classList.add('active');
 }
 
 // ====== 家属协同管理模式 ======

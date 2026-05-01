@@ -6,7 +6,12 @@ var boundPatientName = '';
 // 入口：进入家属模式时调用
 async function initFamilyMode() {
   var user = await getCurrentUser();
-  if (!user) return;
+  if (!user) {
+    // 未登录，先弹登录框
+    showAuthModal();
+    showToast('请先登录或注册一个家属账号');
+    return;
+  }
 
   // 查询绑定的患者
   var patients = await getMyPatients();
@@ -75,7 +80,7 @@ function showFmEmptyState() {
         '<div class="empty-title">还没有绑定家人</div>' +
         '<div class="empty-desc">请先在监护首页绑定家人</div>' +
       '</div>' +
-      '<button class="fm-exit-btn" onclick="switchTab('tab-home')">切换角色</button>';
+      '<button class="fm-exit-btn" onclick="backToRoleSelect()">切换角色</button>';
   }
 
   // 清空药量页假数据
@@ -350,5 +355,5 @@ function loadBoundPatients(patients) {
       '</div>' +
     '</div>' +
     // 切换角色按钮
-    '<button class="fm-exit-btn" onclick="switchTab('tab-home')">切换角色</button>';
+    '<button class="fm-exit-btn" onclick="backToRoleSelect()">切换角色</button>';
 }

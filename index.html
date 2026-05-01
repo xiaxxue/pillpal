@@ -178,8 +178,30 @@
       </div>
     </div>
 
+    <!-- ===== 启动角色选择页 ===== -->
+    <div class="page active" id="page-launch">
+      <div class="launch-logo-area">
+        <div class="launch-logo-circle">&#128172;</div>
+        <div class="launch-app-name">慢病用药小管家</div>
+        <div class="launch-slogan">让每一次服药都安心</div>
+      </div>
+      <div class="launch-cards">
+        <div class="launch-card" onclick="selectRole('patient')">
+          <div class="launch-card-icon">&#128100;</div>
+          <div class="launch-card-title">我是患者</div>
+          <div class="launch-card-desc">管理自己的用药计划、服药打卡、续方购药</div>
+        </div>
+        <div class="launch-card" onclick="selectRole('family')">
+          <div class="launch-card-icon">&#128101;</div>
+          <div class="launch-card-title">我是家属</div>
+          <div class="launch-card-desc">远程查看家人用药情况、提醒服药、代为管理</div>
+        </div>
+      </div>
+      <div class="launch-footer">选择后可随时在设置中切换角色</div>
+    </div>
+
     <!-- ===== 首页（合并用药计划） ===== -->
-    <div class="page active" id="page-home">
+    <div class="page" id="page-home">
       <header class="top-bar" id="topBar">
         <div class="top-bar-full">
           <div class="greeting-row">
@@ -1019,6 +1041,7 @@
             </div>
           </div>
 
+          <button class="fm-enter-btn" onclick="backToRoleSelect()">&#128065; 切换为家属模式</button>
 
           <!-- 家属通知设置 -->
           <div class="notify-settings">
@@ -1361,7 +1384,7 @@
       </header>
       <main class="content">
         <!-- 由 loadBoundPatients() 动态填充 -->
-        <button class="fm-exit-btn" onclick="switchTab('tab-home')">切换角色</button>
+        <button class="fm-exit-btn" onclick="backToRoleSelect()">切换角色</button>
       </main>
     </div>
 
@@ -1383,13 +1406,33 @@
         <div class="tab-icon">&#128105;&#8205;&#9877;</div>
         <div class="tab-label">看医生</div>
       </div>
-      <div class="tab" id="tab-family" onclick="switchTab('tab-family')" style="display:none">
-        <div class="tab-icon">&#128101;</div>
-        <div class="tab-label">家属</div>
-      </div>
       <div class="tab" id="tab-profile" onclick="switchTab('tab-profile')">
         <div class="tab-icon">&#128100;</div>
         <div class="tab-label">个人中心</div>
+      </div>
+    </nav>
+
+    <!-- ===== 家属模式底部导航 ===== -->
+    <nav class="tab-bar family-tab-bar" id="familyTabBar" style="display:none">
+      <div class="tab active" id="fm-tab-home" onclick="switchFamilyTab('fm-tab-home')">
+        <div class="tab-icon">&#128065;</div>
+        <div class="tab-label">监护首页</div>
+      </div>
+      <div class="tab" id="fm-tab-stock" onclick="switchFamilyTab('fm-tab-stock')">
+        <div class="tab-icon">&#128230;</div>
+        <div class="tab-label">药量</div>
+      </div>
+      <div class="tab" id="fm-tab-ai" onclick="switchFamilyTab('fm-tab-ai')">
+        <div class="tab-icon">&#128172;</div>
+        <div class="tab-label">小派助手</div>
+      </div>
+      <div class="tab" id="fm-tab-visit" onclick="switchFamilyTab('fm-tab-visit')">
+        <div class="tab-icon">&#128105;&#8205;&#9877;</div>
+        <div class="tab-label">问诊</div>
+      </div>
+      <div class="tab" id="fm-tab-settings" onclick="switchFamilyTab('fm-tab-settings')">
+        <div class="tab-icon">&#9881;</div>
+        <div class="tab-label">设置</div>
       </div>
     </nav>
 
