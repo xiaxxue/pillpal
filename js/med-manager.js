@@ -455,8 +455,8 @@ function buildRealDatePicker(centerDate) {
     else label = weekNames[d.getDay()];
 
     var activeClass = (dateStr === currentViewDate) ? ' active' : '';
-    // 未来日期标灰
-    var futureStyle = (d > today) ? ' opacity:.5' : '';
+    // 未来日期标灰（严格大于今天才标灰）
+    var futureStyle = (diff > 0) ? ' opacity:.5' : '';
 
     html += '<div class="real-date-item' + activeClass + '" data-date="' + dateStr + '" onclick="switchRealDate(this)" style="' + futureStyle + '">';
     html += '<div class="real-date-week">' + label + '</div>';
