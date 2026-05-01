@@ -1,5 +1,5 @@
 // ====== Service Worker ======
-var CACHE_NAME = 'pillpal-v9';
+var CACHE_NAME = 'pillpal-v10';
 var ASSETS = [
   './',
   './index.html',
