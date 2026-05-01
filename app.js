@@ -581,7 +581,7 @@ function showToast(msg) {
 // --- 记忆模块 ---
 var shortMemory = { history: [], currentTopic: null, mentionedDrug: null };
 var longMemory = {
-  name: '张叔叔',
+  name: '',
   lastTopic: '血压偏高',
   allergies: ['青霉素'],
   bpTrend: '近期偏高'
@@ -1587,9 +1587,9 @@ function endFmConsultation() {
 }
 
 const fmDoctorReplies = {
-  '我是他儿子，他说最近血压还行，大概 135/85': '好的，谢谢您。135/85 稍微偏高一点点，但还在可控范围。\n\n麻烦您回去帮张叔叔量几天血压，早晚各一次，记录下来。如果收缩压经常超过 140 就需要调药了。\n\n这次我先给他续开氨氯地平和阿司匹林，各 30 天的量。药到了提醒他按时吃。',
+  '我是他儿子，他说最近血压还行，大概 135/85': '好的，谢谢您。135/85 稍微偏高一点点，但还在可控范围。\n\n麻烦您回去帮患者量几天血压，早晚各一次，记录下来。如果收缩压经常超过 140 就需要调药了。\n\n这次我先给他续开氨氯地平和阿司匹林，各 30 天的量。药到了提醒他按时吃。',
   '我是他儿子，他最近老说头晕，我有点担心': '头晕的话需要关注。可能跟血压波动有关，也可能是低血糖或者颈椎的问题。\n\n建议这样：头晕的时候帮他量一下血压，记录当时的数值。如果收缩压超过 150 或者低于 100，要及时来复诊。\n\n这次处方我先开 30 天的量，如果头晕频繁或加重，带他来面诊一次比较放心。',
-  '我是他儿子，他没什么不舒服，帮他续个药': '那就好，说明目前方案效果不错。\n\n我给张叔叔续开氨氯地平 5mg 和阿司匹林 100mg，各 30 天。提醒他继续保持低盐饮食，适量活动。\n\n另外麻烦您帮他记录一下每天的血压，下次复诊带过来，大概 4 周后。'
+  '我是他儿子，他没什么不舒服，帮他续个药': '那就好，说明目前方案效果不错。\n\n我给患者续开氨氯地平 5mg 和阿司匹林 100mg，各 30 天。提醒他继续保持低盐饮食，适量活动。\n\n另外麻烦您帮他记录一下每天的血压，下次复诊带过来，大概 4 周后。'
 };
 
 function fmConsultQuickReply(btn) {
@@ -1597,7 +1597,7 @@ function fmConsultQuickReply(btn) {
   addConsultMsg(text, 'patient', 'fmConsultChatArea', 'fmConsultChatScroll', '小');
   document.getElementById('fmConsultQuickReplies').style.display = 'none';
   setTimeout(function() {
-    var reply = fmDoctorReplies[text] || '好的，我了解了。我给张叔叔继续开处方，药到了麻烦您提醒他按时吃。';
+    var reply = fmDoctorReplies[text] || '好的，我了解了。我给患者继续开处方，药到了麻烦您提醒他按时吃。';
     addConsultMsg(reply, 'doctor', 'fmConsultChatArea', 'fmConsultChatScroll', '小');
   }, 1200);
 }
@@ -1610,7 +1610,7 @@ function fmSendConsultMsg() {
   addConsultMsg(text, 'patient', 'fmConsultChatArea', 'fmConsultChatScroll', '小');
   document.getElementById('fmConsultQuickReplies').style.display = 'none';
   setTimeout(function() {
-    addConsultMsg('好的，我了解了。我给张叔叔继续当前方案，处方开好后您确认就可以购药了。药到了提醒他按时吃。', 'doctor', 'fmConsultChatArea', 'fmConsultChatScroll', '小');
+    addConsultMsg('好的，我了解了。我给患者继续当前方案，处方开好后您确认就可以购药了。药到了提醒他按时吃。', 'doctor', 'fmConsultChatArea', 'fmConsultChatScroll', '小');
   }, 1200);
 }
 
@@ -1963,7 +1963,7 @@ function showDoneCheck() {
 
 // 紧急求助
 function emergencyCall() {
-  var msg = '即将拨打紧急电话：\n\n1. 拨打家属（张小明）：138****6789\n2. 拨打急救电话：120\n\n请选择';
+  var msg = '即将拨打紧急电话：\n\n1. 拨打家属（家属）：138****6789\n2. 拨打急救电话：120\n\n请选择';
   if (confirm(msg)) {
     showToast('正在拨打家属电话...');
     // 在真实环境中: window.location.href = 'tel:13800006789';
@@ -2148,11 +2148,11 @@ function buildFamilyDatePicker() {
 
 // 家属版能力分组快捷问题
 var fmSkillQuestions = {
-  fmStatus: ['爸爸今天药都吃了吗？', '爸爸昨天有没有漏服？', '提醒爸爸吃药'],
-  fmStock: ['爸爸哪些药快吃完了？', '药还够吃几天？'],
-  fmRenew: ['帮爸爸续方', '帮爸爸买药'],
-  fmBooking: ['帮爸爸约李医生', '上次医生说了什么？'],
-  fmReport: ['爸爸这周服药情况', '查看服药报告']
+  fmStatus: ['家人今天药都吃了吗？', '家人昨天有没有漏服？', '提醒家人吃药'],
+  fmStock: ['家人哪些药快吃完了？', '药还够吃几天？'],
+  fmRenew: ['帮家人续方', '帮家人买药'],
+  fmBooking: ['帮家人约李医生', '上次医生说了什么？'],
+  fmReport: ['家人这周服药情况', '查看服药报告']
 };
 
 function switchFmSkill(btn) {
@@ -2206,65 +2206,65 @@ function fmDetectIntent(input) {
 // Agent 回复数据
 var fmAgentReplies = {
   todayStatus: {
-    thinking: ['查询爸爸今日打卡记录...', '统计服药进度...', '完成'],
-    text: '爸爸今天的服药情况：已完成 <strong>3/5</strong> 次。',
+    thinking: ['查询家人今日打卡记录...', '统计服药进度...', '完成'],
+    text: '家人今天的服药情况：已完成 <strong>3/5</strong> 次。',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row"><span>&#10003; 07:12</span><span>氨氯地平 + 阿司匹林</span></div>' +
       '<div class="ac-row"><span>&#10003; 08:23</span><span>二甲双胍</span></div>' +
       '<div class="ac-row"><span>&#10003; 14:35</span><span>二甲双胍</span></div>' +
       '<div class="ac-row" style="color:var(--text-third)"><span>&#9675; 21:00</span><span>二甲双胍 + 阿托伐他汀</span></div>' +
-      '<button class="ac-btn" onclick="showToast(\'已提醒爸爸吃晚上的药\')">提醒爸爸吃药</button></div>'
+      '<button class="ac-btn" onclick="showToast(\'已提醒家人吃晚上的药\')">提醒家人吃药</button></div>'
   },
   missed: {
     thinking: ['查询漏服记录...', '完成'],
-    text: '爸爸昨日有 <strong>1 次</strong>漏服：',
+    text: '家人昨日有 <strong>1 次</strong>漏服：',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row" style="color:var(--danger)"><span>&#9888; 4/24 21:00</span><span>二甲双胍 0.5g</span></div>' +
-      '<button class="ac-btn" onclick="showToast(\'已提醒爸爸注意按时吃药\')">提醒爸爸注意</button></div>'
+      '<button class="ac-btn" onclick="showToast(\'已提醒家人注意按时吃药\')">提醒家人注意</button></div>'
   },
   remind: {
     thinking: ['发送提醒...', '完成'],
-    text: '已向爸爸发送服药提醒！',
-    actionCard: '<div class="ai-action-card"><div class="ac-row"><span>&#128276;</span><span>提醒已发送到爸爸的手机</span></div></div>'
+    text: '已向家人发送服药提醒！',
+    actionCard: '<div class="ai-action-card"><div class="ac-row"><span>&#128276;</span><span>提醒已发送到家人的手机</span></div></div>'
   },
   stock: {
-    thinking: ['查询爸爸的药品库存...', '计算剩余天数...', '完成'],
-    text: '爸爸目前的药量情况：',
+    thinking: ['查询家人的药品库存...', '计算剩余天数...', '完成'],
+    text: '家人目前的药量情况：',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row" style="color:var(--danger)"><span>&#9888; 氨氯地平</span><span>12片 · <strong>6天</strong></span></div>' +
       '<div class="ac-row"><span>&#10003; 二甲双胍</span><span>58片 · 19天</span></div>' +
       '<div class="ac-row"><span>&#10003; 阿司匹林</span><span>45片 · 45天</span></div>' +
       '<div class="ac-row"><span>&#10003; 阿托伐他汀</span><span>22片 · 22天</span></div>' +
-      '<button class="ac-btn" onclick="switchFamilyTab(\'fm-tab-stock\')">帮爸爸续方</button></div>',
-    warn: '氨氯地平库存紧张，建议本周帮爸爸续方。'
+      '<button class="ac-btn" onclick="switchFamilyTab(\'fm-tab-stock\')">帮家人续方</button></div>',
+    warn: '氨氯地平库存紧张，建议本周帮家人续方。'
   },
   renew: {
     thinking: ['查询库存...', '检查续方条件...', '检查服药记录...', '分析完成'],
-    text: '帮您检查了爸爸的续方条件：',
+    text: '帮您检查了家人的续方条件：',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row"><span class="ac-status-ok">&#10003;</span><span>近7日服药记录完整</span></div>' +
       '<div class="ac-row"><span class="ac-status-ok">&#10003;</span><span>历史处方可复用</span></div>' +
       '<div class="ac-row"><span class="ac-status-warn">&#9888;</span><span>缺少近期血压记录</span></div>' +
       '<div class="ac-row"><span class="ac-status-ok">&#10003;</span><span>无连续漏服</span></div>' +
-      '<button class="ac-btn" onclick="switchFamilyTab(\'fm-tab-visit\')">帮爸爸问诊续方</button></div>'
+      '<button class="ac-btn" onclick="switchFamilyTab(\'fm-tab-visit\')">帮家人问诊续方</button></div>'
   },
   buy: {
     thinking: ['查询需补货药品...', '完成'],
-    text: '爸爸需要补货的药品：',
+    text: '家人需要补货的药品：',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row" style="color:var(--danger)"><span>氨氯地平 5mg</span><span>仅剩6天</span></div>' +
-      '<button class="ac-btn" onclick="switchFamilyTab(\'fm-tab-stock\')">帮爸爸购药</button></div>'
+      '<button class="ac-btn" onclick="switchFamilyTab(\'fm-tab-stock\')">帮家人购药</button></div>'
   },
   booking: {
     thinking: ['查询医生排班...', '完成'],
     text: '李建华医生（心内科·主任医师）明天可约时段：',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row"><button class="ac-btn-sm" onclick="openBooking(\'video\')">09:00</button> <button class="ac-btn-sm" onclick="openBooking(\'video\')">10:00</button> <button class="ac-btn-sm" onclick="openBooking(\'video\')">14:00</button> <button class="ac-btn-sm" onclick="openBooking(\'video\')">15:00</button></div>' +
-      '<div style="font-size:12px;color:var(--text-sec);margin-top:8px">点击时段帮爸爸预约</div></div>'
+      '<div style="font-size:12px;color:var(--text-sec);margin-top:8px">点击时段帮家人预约</div></div>'
   },
   doctorNotes: {
     thinking: ['查询问诊记录...', '完成'],
-    text: '爸爸最近一次问诊记录：',
+    text: '家人最近一次问诊记录：',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row"><span>日期</span><span>2026.03.28</span></div>' +
       '<div class="ac-row"><span>医生</span><span>李建华 · 心内科</span></div>' +
@@ -2274,7 +2274,7 @@ var fmAgentReplies = {
   },
   report: {
     thinking: ['统计服药数据...', '生成报告...', '完成'],
-    text: '爸爸本周服药报告：',
+    text: '家人本周服药报告：',
     actionCard: '<div class="ai-action-card">' +
       '<div class="ac-row"><span>服药率</span><span style="color:var(--primary);font-weight:700">92%</span></div>' +
       '<div class="ac-row"><span>漏服</span><span style="color:var(--danger);font-weight:700">2次</span></div>' +
@@ -2284,12 +2284,12 @@ var fmAgentReplies = {
   },
   unknown: {
     thinking: ['分析问题...'],
-    text: '关于爸爸的用药，我可以帮您：',
+    text: '关于家人的用药，我可以帮您：',
     actionCard: '<div class="ai-action-card">' +
       '<button class="ac-btn" onclick="fmPlusAction(\'fmStatus\')" style="margin-bottom:6px">查看服药状态</button>' +
       '<button class="ac-btn" onclick="fmPlusAction(\'fmStock\')" style="margin-bottom:6px">查看药量</button>' +
-      '<button class="ac-btn" onclick="fmPlusAction(\'fmRenew\')" style="margin-bottom:6px">帮爸爸续方</button>' +
-      '<button class="ac-btn" onclick="fmPlusAction(\'fmBooking\')" style="margin-bottom:6px">帮爸爸约医生</button>' +
+      '<button class="ac-btn" onclick="fmPlusAction(\'fmRenew\')" style="margin-bottom:6px">帮家人续方</button>' +
+      '<button class="ac-btn" onclick="fmPlusAction(\'fmBooking\')" style="margin-bottom:6px">帮家人约医生</button>' +
       '<button class="ac-btn" onclick="fmPlusAction(\'fmReport\')">查看数据报告</button></div>'
   }
 };
