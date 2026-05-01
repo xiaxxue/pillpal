@@ -472,7 +472,15 @@
               <span class="section-link" onclick="openAddMedModal()">+ 添加药品</span>
             </div>
             <!-- 日期选择器 -->
-            <div class="real-date-picker" id="realDatePicker"></div>
+            <div class="real-date-nav">
+              <button class="real-date-arrow" onclick="shiftDateRange(-7)">&#8249;</button>
+              <div class="real-date-picker" id="realDatePicker"></div>
+              <button class="real-date-arrow" onclick="shiftDateRange(7)">&#8250;</button>
+            </div>
+            <div class="real-date-jump">
+              <input type="date" id="dateJumpInput" onchange="jumpToDate(this.value)">
+              <span class="real-date-jump-label">选择日期</span>
+            </div>
             <div class="med-progress">
               <div class="prog-bar"><div class="prog-fill" id="realProgFill" style="width:0%"></div></div>
               <div class="prog-text" id="realProgText">已完成 0/0 次服药</div>

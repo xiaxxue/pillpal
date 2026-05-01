@@ -424,33 +424,69 @@ function updateStockFromMeds(meds) {
   if (realWeeklyCount) realWeeklyCount.textContent = totalWeekly;
 }
 
-// 生成日期选择器（前3天 + 今天 + 后3天）
-function buildRealDatePicker() {
+// 日期选择器：以 centerDate 为中心显示 7 天
+var datePickerCenter = new Date(); // 当前显示的中心日期
+var currentViewDate = todayStr;
+
+function buildRealDatePicker(centerDate) {
   var picker = document.getElementById('realDatePicker');
   if (!picker) return;
+  if (centerDate) datePickerCenter = new Date(centerDate);
   var today = new Date();
+  today.setHours(0,0,0,0);
   var weekNames = ['周日','周一','周二','周三','周四','周五','周六'];
   var html = '';
   for (var i = -3; i <= 3; i++) {
-    var d = new Date(today);
-    d.setDate(today.getDate() + i);
+    var d = new Date(datePickerCenter);
+    d.setDate(datePickerCenter.getDate() + i);
     var dateStr = d.toISOString().slice(0, 10);
     var day = d.getDate();
+
+    // 跨月显示月份
+    var month = d.getMonth() + 1;
+    var dayLabel = (i === -3 || day === 1) ? month + '/' + day : '' + day;
+
+    // 判断标签
+    var diff = Math.round((d - today) / 86400000);
     var label = '';
-    if (i === -1) label = '昨天';
-    else if (i === 0) label = '今天';
-    else if (i === 1) label = '明天';
+    if (diff === -1) label = '昨天';
+    else if (diff === 0) label = '今天';
+    else if (diff === 1) label = '明天';
     else label = weekNames[d.getDay()];
-    var activeClass = (i === 0) ? ' active' : '';
-    html += '<div class="real-date-item' + activeClass + '" data-date="' + dateStr + '" onclick="switchRealDate(this)">';
+
+    var activeClass = (dateStr === currentViewDate) ? ' active' : '';
+    // 未来日期标灰
+    var futureStyle = (d > today) ? ' opacity:.5' : '';
+
+    html += '<div class="real-date-item' + activeClass + '" data-date="' + dateStr + '" onclick="switchRealDate(this)" style="' + futureStyle + '">';
     html += '<div class="real-date-week">' + label + '</div>';
-    html += '<div class="real-date-day">' + day + '</div>';
+    html += '<div class="real-date-day">' + dayLabel + '</div>';
     html += '</div>';
   }
   picker.innerHTML = html;
+
+  // 设置日期跳转输入框
+  var jumpInput = document.getElementById('dateJumpInput');
+  if (jumpInput) jumpInput.value = currentViewDate;
 }
 
-var currentViewDate = todayStr;
+// 左右翻页
+function shiftDateRange(days) {
+  datePickerCenter.setDate(datePickerCenter.getDate() + days);
+  buildRealDatePicker();
+}
+
+// 跳转到指定日期
+async function jumpToDate(dateStr) {
+  if (!dateStr) return;
+  currentViewDate = dateStr;
+  datePickerCenter = new Date(dateStr);
+  buildRealDatePicker();
+  var title = document.getElementById('realTimelineTitle');
+  if (title) title.textContent = (dateStr === todayStr) ? '今日用药' : dateStr + ' 用药记录';
+  var records = await loadFromCloud(dateStr);
+  await refreshTimeline(dateStr, records);
+}
 
 async function switchRealDate(el) {
   document.querySelectorAll('.real-date-item').forEach(function(d) { d.classList.remove('active'); });
@@ -458,13 +494,12 @@ async function switchRealDate(el) {
   var dateStr = el.getAttribute('data-date');
   currentViewDate = dateStr;
 
-  // 更新标题
   var title = document.getElementById('realTimelineTitle');
-  if (title) {
-    title.textContent = (dateStr === todayStr) ? '今日用药' : dateStr + ' 用药记录';
-  }
+  if (title) title.textContent = (dateStr === todayStr) ? '今日用药' : dateStr + ' 用药记录';
 
-  // 从云端加载该日期的打卡记录
+  var jumpInput = document.getElementById('dateJumpInput');
+  if (jumpInput) jumpInput.value = dateStr;
+
   var records = await loadFromCloud(dateStr);
   await refreshTimeline(dateStr, records);
 }
