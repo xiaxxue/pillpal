@@ -661,7 +661,7 @@ var tools = {
 // --- 快捷问题分组 ---
 var skillQuestions = {
   medMgmt: [
-    { text: '今天还有哪些药没吃？', icon: '&#128138;' },
+    { text: '今天还有哪些药没吃？', icon: '&#128172;' },
     { text: '昨晚漏服二甲双胍怎么办？', icon: '&#128336;' },
     { text: '帮我修改用药计划', icon: '&#9998;' }
   ],
@@ -829,7 +829,7 @@ function showThinkingThenReply(steps, reply) {
   var area = document.getElementById('chatMessages');
   var thinkDiv = document.createElement('div');
   thinkDiv.className = 'chat-msg ai';
-  thinkDiv.innerHTML = '<div class="chat-msg-avatar">&#128138;</div>' +
+  thinkDiv.innerHTML = '<div class="chat-msg-avatar">&#128172;</div>' +
     '<div class="ai-thinking" id="thinkBubble"></div>';
   area.appendChild(thinkDiv);
   scrollChat();
@@ -876,7 +876,7 @@ function generateReply(intent, input, results) {
       shortMemory.mentionedDrug = '氨氯地平';
       var rows = '';
       rows += '<div class="ac-row"><span>&#128203; 历史处方</span><span class="ac-status-ok">有效 (' + (cond.rxDoctor || '李建华') + ')</span></div>';
-      rows += '<div class="ac-row"><span>&#128138; 服药记录</span><span class="ac-status-ok">33/35 按时</span></div>';
+      rows += '<div class="ac-row"><span>&#128172; 服药记录</span><span class="ac-status-ok">33/35 按时</span></div>';
       rows += '<div class="ac-row"><span>&#10003; 无连续漏服</span><span class="ac-status-ok">符合条件</span></div>';
       rows += '<div class="ac-row"><span>&#10084; 血压记录</span><span class="' +
         (cond.bpRecord ? 'ac-status-ok' : 'ac-status-warn') + '">' +
@@ -932,10 +932,10 @@ function generateReply(intent, input, results) {
       var done = meds.filter(function(m) { return m.status === 'done'; });
       var rows = '';
       done.forEach(function(m) {
-        rows += '<div class="ac-row"><span>&#128138; ' + m.name + ' ' + m.time + '</span><span class="ac-status-ok">&#10003; ' + m.actual + '</span></div>';
+        rows += '<div class="ac-row"><span>&#128172; ' + m.name + ' ' + m.time + '</span><span class="ac-status-ok">&#10003; ' + m.actual + '</span></div>';
       });
       pending.forEach(function(m) {
-        rows += '<div class="ac-row"><span>&#128138; ' + m.name + ' ' + m.time + '</span><span class="ac-status-warn">待服用</span></div>';
+        rows += '<div class="ac-row"><span>&#128172; ' + m.name + ' ' + m.time + '</span><span class="ac-status-warn">待服用</span></div>';
       });
       return {
         text: longMemory.name + '，今天您已完成 ' + done.length + '/' + meds.length + ' 次服药' +
@@ -988,7 +988,7 @@ function generateReply(intent, input, results) {
           '<div class="ac-row"><span>&#128172; 方式</span><span>' + visit.type + '</span></div>' +
           '<div class="ac-row ac-row-full"><span>&#128221; 医嘱</span></div>' +
           '<div class="ac-row-detail">' + visit.summary + '</div>' +
-          '<div class="ac-row ac-row-full"><span>&#128138; 处方</span></div>' +
+          '<div class="ac-row ac-row-full"><span>&#128172; 处方</span></div>' +
           '<div class="ac-row-detail">' + visit.rx + '</div>' +
           '</div>',
         warn: null
@@ -1001,7 +1001,7 @@ function generateReply(intent, input, results) {
         text: longMemory.name + '，以下是您近7日的服药数据：',
         actionCard: '<div class="ai-action-card">' +
           '<div class="ac-row"><span>&#128200; 按时服药率</span><span class="ac-status-ok">' + rec.rate + '</span></div>' +
-          '<div class="ac-row"><span>&#128138; 总计/完成</span><span>' + rec.done + '/' + rec.total + ' 次</span></div>' +
+          '<div class="ac-row"><span>&#128172; 总计/完成</span><span>' + rec.done + '/' + rec.total + ' 次</span></div>' +
           '<div class="ac-row"><span>&#9888; 漏服</span><span class="ac-status-warn">' + rec.missed + ' 次</span></div>' +
           '<div class="ac-row"><span>&#128336; 延迟</span><span>' + rec.delayed + ' 次</span></div>' +
           '<div class="ac-row"><span>&#128293; 连续按时</span><span class="ac-status-ok">' + rec.streak + ' 天</span></div>' +
@@ -1015,7 +1015,7 @@ function generateReply(intent, input, results) {
       return {
         text: longMemory.name + '，您可以在用药计划编辑器中修改服药时间、剂量等信息。',
         actionCard: '<div class="ai-action-card">' +
-          '<div class="ac-row"><span>&#128138; 当前方案</span><span>4种药品 · 5次/日</span></div>' +
+          '<div class="ac-row"><span>&#128172; 当前方案</span><span>4种药品 · 5次/日</span></div>' +
           '<button class="ac-btn" onclick="openMedPlanModal()">打开编辑</button>' +
           '</div>',
         warn: '修改用药计划前请先咨询医生，切勿自行调整剂量。'
@@ -1049,7 +1049,7 @@ function generateReply(intent, input, results) {
       return {
         text: longMemory.name + '，我可以帮您做以下这些事：',
         actionCard: '<div class="ai-action-card">' +
-          '<button class="ac-btn ac-btn-outline" onclick="plusMenuAction(\'medMgmt\')">&#128138; 用药管理</button>' +
+          '<button class="ac-btn ac-btn-outline" onclick="plusMenuAction(\'medMgmt\')">&#128172; 用药管理</button>' +
           '<button class="ac-btn ac-btn-outline" onclick="plusMenuAction(\'stockQuery\')">&#128230; 库存查询</button>' +
           '<button class="ac-btn ac-btn-outline" onclick="plusMenuAction(\'renew\')">&#128203; 续方购药</button>' +
           '<button class="ac-btn ac-btn-outline" onclick="plusMenuAction(\'booking\')">&#128197; 预约问诊</button>' +
@@ -1076,7 +1076,7 @@ function addAgentReply(reply) {
   var area = document.getElementById('chatMessages');
   var div = document.createElement('div');
   div.className = 'chat-msg ai';
-  var html = '<div class="chat-msg-avatar">&#128138;</div><div class="chat-msg-bubble">';
+  var html = '<div class="chat-msg-avatar">&#128172;</div><div class="chat-msg-bubble">';
   html += reply.text;
   if (reply.actionCard) {
     html += reply.actionCard;
@@ -2308,7 +2308,7 @@ function fmShowThinking(steps, callback) {
   var area = document.getElementById('fmChatMessages');
   var div = document.createElement('div');
   div.className = 'chat-msg ai';
-  div.innerHTML = '<div class="chat-msg-avatar">&#128138;</div><div class="ai-thinking" id="fmThinkBubble"></div>';
+  div.innerHTML = '<div class="chat-msg-avatar">&#128172;</div><div class="ai-thinking" id="fmThinkBubble"></div>';
   area.appendChild(div);
   fmScrollBottom();
   var bubble = document.getElementById('fmThinkBubble');
@@ -2336,7 +2336,7 @@ function fmAddAgentMsg(data) {
   var area = document.getElementById('fmChatMessages');
   var div = document.createElement('div');
   div.className = 'chat-msg ai';
-  var html = '<div class="chat-msg-avatar">&#128138;</div><div class="chat-msg-bubble">';
+  var html = '<div class="chat-msg-avatar">&#128172;</div><div class="chat-msg-bubble">';
   html += data.text;
   if (data.actionCard) html += data.actionCard;
   if (data.warn) html += '<div class="ai-warn">' + data.warn + '</div>';
