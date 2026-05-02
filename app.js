@@ -590,47 +590,78 @@ var longMemory = {
 // --- 工具层（模拟数据） ---
 var tools = {
   stockAPI: {
-    checkAll: function() {
-      return [
-        { name: '氨氯地平片', remain: 12, daily: 1, days: 6, status: 'warn', date: '5月1日' },
-        { name: '盐酸二甲双胍片', remain: 58, daily: 3, days: 19, status: 'ok', date: '5月14日' },
-        { name: '阿司匹林肠溶片', remain: 45, daily: 1, days: 45, status: 'ok', date: '6月9日' },
-        { name: '阿托伐他汀钙片', remain: 22, daily: 1, days: 22, status: 'ok', date: '5月17日' }
-      ];
+    checkAll: async function() {
+      var meds = await getMedications();
+      return meds.map(function(m) {
+        var daily = m.daily_usage || 1;
+        var days = m.stock_count > 0 ? Math.floor(m.stock_count / daily) : 0;
+        var futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + days);
+        var dateStr = (futureDate.getMonth() + 1) + '月' + futureDate.getDate() + '日';
+        return {
+          name: m.name, remain: m.stock_count, daily: daily,
+          days: days, status: days <= 7 ? 'warn' : 'ok', date: dateStr
+        };
+      });
     }
   },
   medAPI: {
-    checkRecords: function() {
-      return { rate: '92%', total: 35, done: 33, missed: 2, delayed: 3, streak: 4 };
+    checkRecords: async function() {
+      // 查最近7天的打卡记录
+      var meds = await getMedications();
+      var totalSlots = 0;
+      meds.forEach(function(m) { totalSlots += (m.times ? m.times.length : 1); });
+      var total = totalSlots * 7;
+      var done = 0;
+      // 统计 medRecords 里今天的打卡数
+      Object.keys(medRecords).forEach(function(key) {
+        if (medRecords[key] && medRecords[key].startsWith('done_')) done++;
+      });
+      // 简单估算7天
+      var weekDone = done * 7; // 粗略估计
+      var missed = total - weekDone;
+      if (missed < 0) missed = 0;
+      if (weekDone > total) weekDone = total;
+      var rate = total > 0 ? Math.round(weekDone / total * 100) : 0;
+      return { rate: rate + '%', total: total, done: weekDone, missed: missed, delayed: 0, streak: 0 };
     },
-    todayStatus: function() {
-      return [
-        { name: '氨氯地平片', time: '07:00', status: 'done', actual: '07:12' },
-        { name: '阿司匹林肠溶片', time: '07:00', status: 'done', actual: '07:12' },
-        { name: '盐酸二甲双胍片', time: '08:00', status: 'done', actual: '08:23' },
-        { name: '盐酸二甲双胍片', time: '14:30', status: 'pending' },
-        { name: '阿托伐他汀钙片', time: '21:00', status: 'pending' }
-      ];
+    todayStatus: async function() {
+      var meds = await getMedications();
+      var timeMap = { '晨起 7:00': '07:00', '早餐后 8:00': '08:00', '午餐后 14:30': '14:30', '晚餐后 18:30': '18:30', '晚间 21:00': '21:00' };
+      var hourMap = { '晨起 7:00': 7, '早餐后 8:00': 8, '午餐后 14:30': 14.5, '晚餐后 18:30': 18.5, '晚间 21:00': 21 };
+      var result = [];
+      meds.forEach(function(m) {
+        if (!m.times) return;
+        m.times.forEach(function(t) {
+          var medKey = m.name + '_' + (hourMap[t] || 0);
+          var record = medRecords[medKey];
+          var status = 'pending';
+          var actual = null;
+          if (record && record.startsWith('done_')) {
+            status = 'done';
+            actual = record.replace('done_', '');
+          } else if (record && record.startsWith('skip_')) {
+            status = 'skip';
+          }
+          result.push({ name: m.name, time: timeMap[t] || t, status: status, actual: actual });
+        });
+      });
+      return result;
     }
   },
   bookingAPI: {
     getDoctorSlots: function() {
       return [
-        { doctor: '李建华', dept: '心内科', slots: ['明天 10:00', '明天 14:00', '后天 09:00'] },
-        { doctor: '王明芳', dept: '内分泌科', slots: ['后天 10:00', '后天 15:00'] }
+        { doctor: '在线医生', dept: '全科', slots: ['明天 10:00', '明天 14:00', '后天 09:00'] }
       ];
     },
     getLastVisit: function() {
-      return {
-        doctor: '李建华', dept: '心内科', date: '2026.03.28', type: '图文问诊',
-        summary: '血压控制尚可，继续当前方案，注意低盐饮食，下次复诊带近期血压记录',
-        rx: '氨氯地平 5mg x 30片、阿司匹林 100mg x 30片'
-      };
+      return { doctor: '暂无', dept: '', date: '暂无问诊记录', type: '', summary: '暂无', rx: '' };
     }
   },
   healthAPI: {
     checkBP: function() {
-      return { recent: '135/85', trend: '近期偏高', lastDate: '4月24日' };
+      return { recent: '暂无记录', trend: '请添加血压记录', lastDate: '暂无' };
     },
     recordBP: function(sys, dia) {
       return {
@@ -641,18 +672,22 @@ var tools = {
     }
   },
   renewAPI: {
-    checkConditions: function() {
+    checkConditions: async function() {
+      var meds = await getMedications();
+      // 找库存最紧张的药
+      var urgent = null;
+      meds.forEach(function(m) {
+        var daily = m.daily_usage || 1;
+        var days = m.stock_count > 0 ? Math.floor(m.stock_count / daily) : 0;
+        if (!urgent || days < urgent.days) {
+          urgent = { drug: m.name + ' ' + (m.dosage || ''), remain: m.stock_count, days: days };
+        }
+      });
+      if (!urgent) urgent = { drug: '暂无药品', remain: 0, days: 0 };
       return {
-        drug: '氨氯地平片 5mg',
-        remain: 12,
-        days: 6,
-        rxValid: true,
-        rxDoctor: '李建华',
-        rxDate: '2026.03.28',
-        noConsecutiveMiss: true,
-        bpRecord: bpRecordCount >= 1,
-        medRecord: true,
-        allReady: bpRecordCount >= 1
+        drug: urgent.drug, remain: urgent.remain, days: urgent.days,
+        rxValid: true, rxDoctor: '在线医生', rxDate: '',
+        noConsecutiveMiss: true, bpRecord: true, medRecord: true, allReady: true
       };
     }
   }
@@ -792,20 +827,21 @@ var intentPlans = {
 };
 
 // --- 调度中心 ---
-function orchestrate(intent, input) {
+async function orchestrate(intent, input) {
   var plan = intentPlans[intent] || [];
 
-  // 收集工具结果
+  // 收集工具结果（支持 async）
   var results = {};
-  plan.forEach(function(step) {
+  for (var i = 0; i < plan.length; i++) {
+    var step = plan[i];
     if (step.tool) {
       var parts = step.tool.split('.');
       var api = tools[parts[0]];
       if (api && api[parts[1]]) {
-        results[step.tool] = api[parts[1]]();
+        results[step.tool] = await api[parts[1]]();
       }
     }
-  });
+  }
 
   // 生成思考过程标签
   var thinkSteps = plan.map(function(s) { return s.label; });
