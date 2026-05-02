@@ -291,8 +291,7 @@ async function refreshTimeline(dateStr, dateRecords) {
         html += '<span class="mc-status-done">&#10003; ' + takenTime + '</span>';
         html += '<button class="btn-undo" onclick="undoMed(this)">撤回</button>';
         html += '</div>';
-        html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
-        html += '</div>';
+          html += '</div>';
       } else if (isSkipped) {
         // 已跳过状态
         var reason = record.replace('skip_', '');
@@ -302,8 +301,7 @@ async function refreshTimeline(dateStr, dateRecords) {
         html += '<div class="mc-detail">' + escapeHtml(med.dosage) + '</div>';
         html += '</div>';
         html += '<div class="mc-right"><span class="mc-status-done" style="color:var(--text-third)">已跳过 · ' + reason + '</span></div>';
-        html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
-        html += '</div>';
+          html += '</div>';
       } else {
         // 未打卡状态
         if (isToday) {
@@ -320,8 +318,7 @@ async function refreshTimeline(dateStr, dateRecords) {
           html += '<button class="btn-later-sm" onclick="laterMedCard(this)">30分钟后提醒</button>';
           html += '<button class="btn-skip" onclick="skipMedCard(this)">跳过</button>';
           html += '</div>';
-          html += '<button class="mc-delete" onclick="handleDeleteMed(\'' + med.id + '\', \'' + escapeHtml(med.name) + '\')">&times;</button>';
-          html += '</div>';
+              html += '</div>';
         } else {
           // 非今天：只读，显示"未服用"
           html += '<div class="med-card" data-med-id="' + (med.id || '') + '" style="flex-direction:row;opacity:0.6">';
