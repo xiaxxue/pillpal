@@ -92,8 +92,15 @@ async function restoreStock(card) {
 
 // ====== 删除药品 ======
 async function handleDeleteMed(medId, medName) {
-  if (!confirm('确定要删除「' + medName + '」吗？删除后无法恢复。')) return;
+  if (!medId || medId.length < 10) {
+    console.error('handleDeleteMed: 无效的 medId:', medId);
+    return;
+  }
+  // 二次确认
+  if (!confirm('确定要删除「' + medName + '」吗？\n\n删除后无法恢复！')) return;
+  if (!confirm('再次确认：真的要删除「' + medName + '」吗？')) return;
 
+  console.log('handleDeleteMed: 用户确认删除', medName, medId);
   await deleteMedication(medId);
   showToast(medName + ' 已从用药计划中删除');
   await refreshTimeline();

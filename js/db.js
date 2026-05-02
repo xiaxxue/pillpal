@@ -68,9 +68,16 @@ async function updateMedication(medId, updates) {
 
 // 删除药品
 async function deleteMedication(medId) {
+  // 安全检查：必须有有效的 UUID 格式的 medId
+  if (!medId || medId.length < 10) {
+    console.error('deleteMedication: 无效的 medId:', medId, '已阻止删除');
+    return;
+  }
+  console.log('deleteMedication: 正在删除药品 ID=' + medId);
   var user = await getCurrentUser();
   if (user) {
-    await sb.from('medications').delete().eq('id', medId);
+    var result = await sb.from('medications').delete().eq('id', medId).eq('user_id', user.id);
+    console.log('deleteMedication: 删除结果', result.error ? result.error.message : '成功');
     return;
   }
   var meds = loadData('medications', []);
